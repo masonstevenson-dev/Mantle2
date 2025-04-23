@@ -43,7 +43,7 @@ struct FM2RecordHandle
 	GENERATED_BODY()
 
 public:
-FM2RecordHandle() = default;
+	FM2RecordHandle() = default;
 	FM2RecordHandle(FGuid NewSetId, FGuid NewRecordId) : SetId(NewSetId), RecordId(NewRecordId) {}
 
 private:
