@@ -1,0 +1,30 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0",
+  "EngineVersion": "5.4.0",
+  "FriendlyName": "Mantle2 ECS",
+  "Description": "A simplified ECS for Unreal Engine.",
+  "Category": "Mantle",
+  "CreatedBy": "Mason Stevenson",
+  "CreatedByURL": "https://masonstevenson.dev",
+  "DocsURL": "",
+  "MarketplaceURL": "",
+  "SupportURL": "",
+  "EnabledByDefault": true,
+  "CanContainContent": false,
+  "IsBetaVersion": true,
+  "Modules": [
+    {
+      "Name": "M2Runtime",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "AnankeCore",
+      "Enabled": true
+    }
+  ]
+}
