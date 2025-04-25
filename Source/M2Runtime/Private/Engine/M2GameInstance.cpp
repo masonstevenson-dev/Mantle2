@@ -31,6 +31,7 @@
 
 #include "Engine/M2GameInstance.h"
 
+#include "EffectSystem/M2EffectManager.h"
 #include "Foundation/M2Engine.h"
 #include "Logging/M2LoggingDefs.h"
 #include "Logging/M2LoggingMacros.h"
@@ -93,6 +94,19 @@ void UM2GameInstance::OnWorldChanged(UWorld* OldWorld, UWorld* NewWorld)
 	}
 	
 	M2_LOG_OBJECT(this, LogM2, Log, TEXT("World changed to %s"), *CurrentWorld->GetName());
+}
+
+void UM2GameInstance::ConfigureM2Engine(UM2Engine& Engine)
+{
+	FM2EngineLoopOptions PrePhysicsPhase;
+	PrePhysicsPhase.OperationGroups.AddDefaulted();
+	
+	PrePhysicsPhase.OperationGroups.AddDefaulted();
+	PrePhysicsPhase.OperationGroups.Last().Operations.Append({
+		Engine.NewOperation<UM2EffectManager>(),
+	});
+
+	Engine.ConfigureEngineLoop(TG_PrePhysics, PrePhysicsPhase);
 }
 
 void UM2GameInstance::OnWorldBeginPlay()

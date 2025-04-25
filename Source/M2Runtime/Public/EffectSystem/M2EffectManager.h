@@ -30,34 +30,21 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
-#include "Engine/World.h"
-#include "Foundation/M2Engine.h"
+#include "Foundation/M2Operation.h"
 
-#include "M2GameInstance.generated.h"
+#include "M2EffectManager.generated.h"
 
-// GameInstance class responsible for configuring Mantle operations and start/stopping M2Engine. Inheriting from this
-// class is not required to run Mantle, but doing so cuts down on a bit of boilerplate you'll need to write.
-//
-// Simply extend this class, implement ConfigureM2Engine to initialize your engine loops, and you should be good to go.
 UCLASS()
-class M2RUNTIME_API UM2GameInstance : public UGameInstance
+class UM2EffectManager : public UM2Operation
 {
 	GENERATED_BODY()
 
 public:
-	virtual void Init() override;
-	virtual void Shutdown() override;
-	virtual void OnWorldChanged(UWorld* OldWorld, UWorld* NewWorld) override;
+	virtual void Initialize(UM2Registry* Registry) override;
 
 protected:
-	// Implement this and call Engine.ConfigureEngineLoop() to set up your operations.
-	virtual void ConfigureM2Engine(UM2Engine& Engine);
+	virtual void PerformOperation(FM2OperationContext& Ctx) override;
 
-	void OnWorldBeginPlay();
-	void OnWorldTearDown(UWorld* OldWorld);
-	
-	UPROPERTY()
-	TWeakObjectPtr<UWorld> CurrentWorld = nullptr;
-	
-	bool bIsInitialized = false;
+private:
+	TArray<FM2RecordHandle> PendingDeletions;
 };

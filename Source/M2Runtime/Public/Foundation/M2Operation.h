@@ -45,10 +45,13 @@ struct M2RUNTIME_API FM2OperationContext
 
 public:
 	UPROPERTY()
-	TWeakObjectPtr<UM2Registry> Registry;
+	TWeakObjectPtr<UM2Registry> Registry = nullptr;
 	
 	UPROPERTY()
-	TWeakObjectPtr<UWorld> World;
+	TWeakObjectPtr<UWorld> World = nullptr;
+
+	UPROPERTY()
+	float DeltaTime = 0.0f;
 };
 
 UCLASS()
@@ -59,7 +62,7 @@ class M2RUNTIME_API UM2Operation : public UObject
 public:
 	~UM2Operation();
 
-	virtual void Initialize() {}
+	virtual void Initialize(UM2Registry* Registry) {}
 	
 	void Run(FM2OperationContext& Ctx);
 

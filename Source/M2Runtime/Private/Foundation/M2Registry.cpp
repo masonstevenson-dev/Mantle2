@@ -44,6 +44,24 @@ bool UM2Registry::HasRecord(const FM2RecordHandle& RecordHandle)
 	);
 }
 
+void UM2Registry::RemoveRecord(FM2RecordHandle& RecordHandle)
+{
+	if (!RecordHandle.SetId.IsValid() || !RecordHandle.RecordId.IsValid())
+	{
+		return;
+	}
+	
+	TObjectPtr<UM2RecordSet>* Result = SetsById.Find(RecordHandle.SetId);
+	if (!Result)
+	{
+		// "stale" meaning at some point guid was generated for this set id, but now we can't find the matching recordset.
+		M2_LOG(LogM2, Error, TEXT("RecordHandle has stale set id"));
+		return;
+	}
+
+	Result->Get()->RemoveRecord(RecordHandle);
+}
+
 TArray<UM2RecordSet*> UM2Registry::GetAll(TArray<TSubclassOf<UM2RecordSet>>& RecordTypes)
 {
 	TArray<UM2RecordSet*> Result;

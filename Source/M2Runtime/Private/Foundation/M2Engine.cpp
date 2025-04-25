@@ -54,6 +54,8 @@ void FM2EngineLoop::ExecuteTick(
 		return;
 	}
 
+	OperationContext.DeltaTime = DeltaTime;
+
 	for (FM2OperationGroup& OperationGroup : Options.OperationGroups)
 	{
 		// In the future, we may support multithreading by running operations in the same OperationGroup concurrently.
@@ -151,7 +153,7 @@ void UM2Engine::FinishConfiguration()
 {
 	for (TObjectPtr<UM2Operation> Operation : Operations)
 	{
-		Operation->Initialize();
+		Operation->Initialize(Registry);
 	}
 	
 	EngineState = EM2EngineState::Stopped;	

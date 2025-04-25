@@ -135,6 +135,9 @@ public:
 	template<typename OperationType>
 	TWeakObjectPtr<OperationType> NewOperation()
 	{
+		// TODO(): Double check this does what it should do.
+		static_assert(std::is_base_of_v<UM2Operation, OperationType>);
+		
 		if (EngineState != EM2EngineState::Initialize)
 		{
 			return nullptr;

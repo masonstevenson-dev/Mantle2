@@ -66,19 +66,9 @@ public:
 	/**
 	 * Removes a record from the registry, if it exists.
 	 * 
-	 * @tparam RecordType - The type of record to remove.
 	 * @param RecordHandle - The handle for the record that should be removed.
 	 */
-	template <typename RecordType>
-	void RemoveRecord(FM2RecordHandle& RecordHandle)
-	{
-		static_assert(std::is_base_of_v<UM2RecordSet, RecordType>);
-		TObjectPtr<UM2RecordSet>* Result = SetsByType.Find(RecordType::StaticClass());
-		if (Result)
-		{
-			Result->Get()->RemoveRecord(RecordHandle);
-		}
-	}
+	void RemoveRecord(FM2RecordHandle& RecordHandle);
 
 	/**
 	 *	Gets a compacted array of fields of a particular type for each record of a particular type.
@@ -122,7 +112,7 @@ public:
 	{
 		static_assert(std::is_base_of_v<UM2RecordSet, RecordType>);
 		TObjectPtr<UM2RecordSet>* Result = SetsByType.Find(RecordType::StaticClass());
-		return Result ? Result->Get() : nullptr;
+		return Result ? Cast<RecordType>(Result->Get()) : nullptr;
 	}
 	
 	/**
@@ -154,15 +144,29 @@ public:
 	 * @return Returns the shared object.
 	 */
 	template <typename BaseType>
-	BaseType& GetShared(TSubclassOf<BaseType> TargetType, bool bCacheEnabled = true)
+	BaseType* GetShared(UClass* TargetType, bool bCacheEnabled = true)
 	{
-		TObjectPtr<BaseType> TheObject = nullptr;
+		if (!TargetType)
+		{
+			return nullptr;
+		}
+		
+		BaseType* TheObject = nullptr;
 		bool bNewlyConstructed = false;
 		
 		if (!SharedObjects.Contains(TargetType) || !IsValid(SharedObjects.FindChecked(TargetType)))
 		{
 			TheObject = NewObject<BaseType>(this, TargetType);
 			bNewlyConstructed = true;
+		}
+		else
+		{
+			TheObject = Cast<BaseType>(SharedObjects.FindChecked(TargetType).Get());
+		}
+
+		if (!TheObject)
+		{
+			return nullptr;
 		}
 
 		if (!bCacheEnabled)
@@ -174,7 +178,7 @@ public:
 			SharedObjects.Add(TargetType, TheObject);
 		}
 
-		return SharedObjects.FindChecked(TargetType);
+		return TheObject;
 	}
 
 	/**
@@ -219,7 +223,7 @@ protected:
 	TMap<TSubclassOf<UM2RecordSet>, TObjectPtr<UM2RecordSet>> SetsByType;
 
 	UPROPERTY()
-	TMap<TSubclassOf<UObject>, TObjectPtr<UObject>> SharedObjects;
+	TMap<UClass*, TObjectPtr<UObject>> SharedObjects;
 
 private:
 	bool IsClassExcluded(UClass* TargetClass);
