@@ -56,6 +56,16 @@ public:
 	bool bIsOpen = false;
 };
 
+USTRUCT()
+struct FM2TestField_StaticEnvironment
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	float Opacity = 0.0f;
+};
+
 UCLASS()
 class UM2TestRecordSet : public UM2RecordSet { GENERATED_BODY() };
 
@@ -84,6 +94,20 @@ public:
 
 	M2_DECLARE_FIELD(FM2TestField_Avatar, Avatar);
 	M2_DECLARE_FIELD(FM2TestField_Door, Door);
+};
+
+UCLASS()
+class UM2TestSet_Wall : public UM2TestRecordSet
+{
+	GENERATED_BODY()
+
+public:
+	friend TestSuite;
+	
+	virtual void Initialize(FGuid NewSetId) override;
+
+	M2_DECLARE_FIELD(FM2TestField_Avatar, Avatar);
+	M2_DECLARE_FIELD(FM2TestField_StaticEnvironment, StaticEnvironment);
 };
 
 UCLASS()

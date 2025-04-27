@@ -49,6 +49,17 @@ public:
 	FM2RecordHandle() = default;
 	FM2RecordHandle(FGuid NewSetId, FGuid NewRecordId) : SetId(NewSetId), RecordId(NewRecordId) {}
 
+	bool operator ==(const FM2RecordHandle& Other) const
+	{
+		return SetId == Other.SetId && RecordId == Other.RecordId;
+	}
+
+	void Clear()
+	{
+		SetId = FGuid();
+		RecordId = FGuid();
+	}
+
 private:
 	friend UM2Registry;
 	friend UM2RecordSet;

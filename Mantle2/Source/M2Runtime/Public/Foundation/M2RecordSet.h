@@ -43,6 +43,8 @@ class TestSuite;
 	GetFieldFns.Add(FieldType::StaticStruct(), [this](){ return FAnankeUntypedArrayView(FieldName.GetData(), FieldName.Num()); });	\
 	Archetype.Add(FieldType::StaticStruct());
 
+// TODO(): Implement M2_INITIALIZE_TAG(FieldType, FieldName). This should just add FieldType to a collection of supported tags. 
+
 #define M2_INITIALIZE_FIELD_WITH_SINGLETON(FieldType, FieldName)	\
 	M2_INITIALIZE_FIELD(FieldType, FieldName);						\
 	Get##FieldName();
@@ -108,10 +110,14 @@ public:
 	FM2RecordHandle AddRecord();
 	void RemoveRecord(FM2RecordHandle& RecordHandle);
 
+	// Note: Calling Get{some field name}() will automatically recreate the singleton.
+	void ClearSingleton();
+
 protected:
 	friend TestSuite;
 	
 	FAnankeUntypedArrayView GetFieldInternal(UScriptStruct* FieldType);
+	void RemoveRecordInternal(FM2RecordHandle& RecordHandle);
 
 	UPROPERTY()
 	FGuid SetId = FGuid();

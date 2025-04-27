@@ -76,6 +76,33 @@ FM2RecordHandle UM2RecordSet::AddRecord()
 
 void UM2RecordSet::RemoveRecord(FM2RecordHandle& RecordHandle)
 {
+	if (RecordHandle == SingletonHandle)
+	{
+		return;
+	}
+
+	RemoveRecordInternal(RecordHandle);
+}
+
+void UM2RecordSet::ClearSingleton()
+{
+	RemoveRecordInternal(SingletonHandle);
+	SingletonHandle.Clear();
+}
+
+FAnankeUntypedArrayView UM2RecordSet::GetFieldInternal(UScriptStruct* ComponentType)
+{
+	if (!GetFieldFns.Contains(ComponentType))
+	{
+		return FAnankeUntypedArrayView();
+	}
+
+	TFunction<FAnankeUntypedArrayView()> GetFieldFn = GetFieldFns.FindChecked(ComponentType);
+	return GetFieldFn();
+}
+
+void UM2RecordSet::RemoveRecordInternal(FM2RecordHandle& RecordHandle)
+{
 	if (!RecordHandle.SetId.IsValid() || RecordHandle.SetId != SetId)
 	{
 		return;
@@ -109,15 +136,4 @@ void UM2RecordSet::RemoveRecord(FM2RecordHandle& RecordHandle)
 		check(RecordHandles[RecordIndex].RecordId == LastId);
 		RecordIndexMap[LastId] = RecordIndex;	
 	}
-}
-
-FAnankeUntypedArrayView UM2RecordSet::GetFieldInternal(UScriptStruct* ComponentType)
-{
-	if (!GetFieldFns.Contains(ComponentType))
-	{
-		return FAnankeUntypedArrayView();
-	}
-
-	TFunction<FAnankeUntypedArrayView()> GetFieldFn = GetFieldFns.FindChecked(ComponentType);
-	return GetFieldFn();
 }

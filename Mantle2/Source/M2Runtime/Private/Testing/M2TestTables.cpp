@@ -46,6 +46,14 @@ void UM2TestSet_Door::Initialize(FGuid NewSetId)
 	M2_INITIALIZE_FIELD(FM2TestField_Door, Door);
 }
 
+void UM2TestSet_Wall::Initialize(FGuid NewSetId)
+{
+	Super::Initialize(NewSetId);
+
+	M2_INITIALIZE_FIELD(FM2TestField_Avatar, Avatar);
+	M2_INITIALIZE_FIELD(FM2TestField_StaticEnvironment, StaticEnvironment);
+}
+
 void UM2TestSet_Excluded::Initialize(FGuid NewSetId)
 {
 	Super::Initialize(NewSetId);

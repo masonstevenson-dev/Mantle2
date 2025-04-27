@@ -112,12 +112,12 @@ public:
 	/**
 	 * Fetches a list of RecordSets matching a particular composition.
 	 *
-	 * @param MatchColumns - A list of column types that every RecordSet in the result must contain.
-	 * @param ExcludeColumns - A list of column types that must not be present in any of RecordSets in the result.
+	 * @param MatchFields - A list of field types that every RecordSet in the result must contain.
+	 * @param ExcludeFields - A list of field types that must not be present in any of RecordSets in the result.
 	 *
 	 * @return Returns an array containing any RecordSets found that match the target composition.
 	 */
-	TArray<UM2RecordSet*> GetAll(TArray<UScriptStruct*>& MatchColumns, TArray<UScriptStruct*>& ExcludeColumns);
+	TArray<UM2RecordSet*> GetAll(TArray<UScriptStruct*>& MatchFields, TArray<UScriptStruct*>& ExcludeFields);
 
 	
 	/**

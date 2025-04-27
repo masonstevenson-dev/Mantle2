@@ -93,11 +93,10 @@ public:
 	{
 		Registry->ConstructRecordSets();
 
-		Registry->GetRecordSet<UM2TestSet_Player>()->GetAvatar(); // construct singleton
-
-		Registry->AddRecord<UM2TestSet_Door>();
-		Registry->AddRecord<UM2TestSet_Door>();
-		Registry->AddRecord<UM2TestSet_Door>();
+		TestRH_1 = Registry->AddRecord<UM2TestSet_Door>();
+		TestRH_2 = Registry->AddRecord<UM2TestSet_Door>();
+		TestRH_3 = Registry->AddRecord<UM2TestSet_Door>();
+		TestRH_Invalid = FM2RecordHandle();
 
 		UM2TestSet_Door* DoorSet = Registry->GetRecordSet<UM2TestSet_Door>();
 
@@ -108,6 +107,19 @@ public:
 		DoorSet->Avatar[0].WorldPosition = FVector(1.0, 1.0, 1.0);
 		DoorSet->Avatar[1].WorldPosition = FVector(2.0, 2.0, 2.0);
 		DoorSet->Avatar[2].WorldPosition = FVector(3.0, 3.0, 3.0);
+
+		TestRH_4 = Registry->AddRecord<UM2TestSet_Wall>();
+		TestRH_5 = Registry->AddRecord<UM2TestSet_Wall>();
+		TestRH_6 = Registry->AddRecord<UM2TestSet_Wall>();
+
+		UM2TestSet_Wall* WallSet = Registry->GetRecordSet<UM2TestSet_Wall>();
+		WallSet->Avatar[0].WorldPosition = FVector(4.0, 4.0, 4.0);
+		WallSet->Avatar[1].WorldPosition = FVector(5.0, 5.0, 5.0);
+		WallSet->Avatar[2].WorldPosition = FVector(6.0, 6.0, 6.0);
+
+		WallSet->StaticEnvironment[0].Opacity = 0.1f;
+		WallSet->StaticEnvironment[1].Opacity = 0.2f;
+		WallSet->StaticEnvironment[2].Opacity = 0.3f;
 	}
 
 	void Test_SmokeTest()
@@ -150,11 +162,11 @@ public:
 		InitRegistry();
 
 		UM2TestSet_Door* DoorSet = Registry->GetRecordSet<UM2TestSet_Door>();
-		ANANKE_TEST_NOT_NULL(TestFramework, DoorSet)
+		ANANKE_TEST_NOT_NULL(TestFramework, DoorSet);
 
-		ANANKE_TEST_TRUE(TestFramework, DoorSet->GetHandles().Num() == 3);
-		ANANKE_TEST_TRUE(TestFramework, DoorSet->Door.Num() == 3);
-		ANANKE_TEST_TRUE(TestFramework, DoorSet->Avatar.Num() == 3);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->GetHandles().Num(), 3);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Door.Num(), 3);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Avatar.Num(), 3);
 
 		FM2RecordHandle NewRecordHandle = Registry->AddRecord<UM2TestSet_Door>();
 		Registry->GetField<UM2TestSet_Door, FM2TestField_Door>(NewRecordHandle)->bIsOpen = true;
@@ -169,16 +181,16 @@ public:
 		ANANKE_TEST_TRUE(TestFramework, NewRecordHandle.SetId == DoorSet->SetId);
 		ANANKE_TEST_TRUE(TestFramework, DoorSet->RecordIndexMap.Contains(NewRecordHandle.RecordId));
 		ANANKE_TEST_TRUE(TestFramework, Registry->HasRecord(NewRecordHandle));
-		ANANKE_TEST_TRUE(TestFramework, DoorSet->GetHandles().Num() == 4);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->GetHandles().Num(), 4);
 		
 		TArrayView<FM2TestField_Door> DoorFields = DoorSet->GetFieldArray<FM2TestField_Door>();
 		TArrayView<FM2TestField_Avatar> AvatarFields = DoorSet->GetFieldArray<FM2TestField_Avatar>();
 		
-		if (!ANANKE_TEST_TRUE(TestFramework, DoorFields.Num() == 4))
+		if (!ANANKE_TEST_EQUAL(TestFramework, DoorFields.Num(), 4))
 		{
 			return;
 		}
-		if (!ANANKE_TEST_TRUE(TestFramework, AvatarFields.Num() == 4))
+		if (!ANANKE_TEST_EQUAL(TestFramework, AvatarFields.Num(), 4))
 		{
 			return;
 		}
@@ -188,30 +200,216 @@ public:
 		ANANKE_TEST_TRUE(TestFramework, DoorFields[2].bIsOpen == false);
 		ANANKE_TEST_TRUE(TestFramework, DoorFields[3].bIsOpen == true);
 
-		ANANKE_TEST_TRUE(TestFramework, AvatarFields[0].WorldPosition == FVector(1.0, 1.0, 1.0));
-		ANANKE_TEST_TRUE(TestFramework, AvatarFields[1].WorldPosition == FVector(2.0, 2.0, 2.0));
-		ANANKE_TEST_TRUE(TestFramework, AvatarFields[2].WorldPosition == FVector(3.0, 3.0, 3.0));
-		ANANKE_TEST_TRUE(TestFramework, AvatarFields[3].WorldPosition == FVector(42.0, 42.0, 42.0));
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[0].WorldPosition, FVector(1.0, 1.0, 1.0));
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[1].WorldPosition, FVector(2.0, 2.0, 2.0));
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[2].WorldPosition, FVector(3.0, 3.0, 3.0));
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[3].WorldPosition, FVector(42.0, 42.0, 42.0));
 	}
 
 	void Test_RemoveRecord()
 	{
-		// TODO()
+		InitRegistry();
+
+		UM2TestSet_Door* DoorSet = Registry->GetRecordSet<UM2TestSet_Door>();
+		ANANKE_TEST_NOT_NULL(TestFramework, DoorSet);
+
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->GetHandles().Num(), 3);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Door.Num(), 3);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Avatar.Num(), 3);
+
+		Registry->RemoveRecord(DoorSet->GetHandles()[1]);
+
+		TArrayView<FM2TestField_Door> DoorFields = DoorSet->GetFieldArray<FM2TestField_Door>();
+		TArrayView<FM2TestField_Avatar> AvatarFields = DoorSet->GetFieldArray<FM2TestField_Avatar>();
+		
+		if (!ANANKE_TEST_EQUAL(TestFramework, DoorFields.Num(), 2))
+		{
+			return;
+		}
+		if (!ANANKE_TEST_EQUAL(TestFramework, AvatarFields.Num(), 2))
+		{
+			return;
+		}
+
+		ANANKE_TEST_TRUE(TestFramework, DoorFields[0].bIsOpen == false);
+		ANANKE_TEST_TRUE(TestFramework, DoorFields[1].bIsOpen == false);
+
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[0].WorldPosition, FVector(1.0, 1.0, 1.0));
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[1].WorldPosition, FVector(3.0, 3.0, 3.0));
+
+		FM2RecordHandle NewRecordHandle = Registry->AddRecord<UM2TestSet_Door>();
+		Registry->GetField<UM2TestSet_Door, FM2TestField_Door>(NewRecordHandle)->bIsOpen = true;
+		Registry->GetField<UM2TestSet_Door, FM2TestField_Avatar>(NewRecordHandle)->WorldPosition = FVector(42.0, 42.0, 42.0);
+
+		DoorFields = DoorSet->GetFieldArray<FM2TestField_Door>();
+		AvatarFields = DoorSet->GetFieldArray<FM2TestField_Avatar>();
+		
+		if (!ANANKE_TEST_TRUE(TestFramework, DoorFields.Num() == 3))
+		{
+			return;
+		}
+		if (!ANANKE_TEST_TRUE(TestFramework, AvatarFields.Num() == 3))
+		{
+			return;
+		}
+
+		ANANKE_TEST_EQUAL(TestFramework, DoorFields[0].bIsOpen, false);
+		ANANKE_TEST_EQUAL(TestFramework, DoorFields[1].bIsOpen, false);
+		ANANKE_TEST_EQUAL(TestFramework, DoorFields[2].bIsOpen, true);
+
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[0].WorldPosition, FVector(1.0, 1.0, 1.0));
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[1].WorldPosition, FVector(3.0, 3.0, 3.0));
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[2].WorldPosition, FVector(42.0, 42.0, 42.0));
+
+		for (FM2RecordHandle RecordHandle : DoorSet->GetHandles())
+		{
+			Registry->RemoveRecord(RecordHandle);
+		}
+
+		DoorFields = DoorSet->GetFieldArray<FM2TestField_Door>();
+		AvatarFields = DoorSet->GetFieldArray<FM2TestField_Avatar>();
+
+		ANANKE_TEST_EQUAL(TestFramework, DoorFields.Num(), 0);
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields.Num(), 0);
 	}
 
 	void Test_GetField()
 	{
-		// TODO()
+		InitRegistry();
+
+		FM2TestField_Avatar* Field1 = Registry->GetField<UM2TestSet_Door, FM2TestField_Avatar>(TestRH_1);
+		FM2TestField_Avatar* Field2 = Registry->GetField<UM2TestSet_Door, FM2TestField_Avatar>(TestRH_2);
+		FM2TestField_Avatar* Field3 = Registry->GetField<UM2TestSet_Door, FM2TestField_Avatar>(TestRH_3);
+		FM2TestField_Avatar* InvalidField = Registry->GetField<UM2TestSet_Door, FM2TestField_Avatar>(TestRH_Invalid);
+
+		ANANKE_TEST_NOT_NULL(TestFramework, Field1);
+		ANANKE_TEST_NOT_NULL(TestFramework, Field2);
+		ANANKE_TEST_NOT_NULL(TestFramework, Field3);
+		ANANKE_TEST_TRUE(TestFramework, InvalidField == nullptr);
+
+		Field1->WorldPosition += FVector(1.0, 1.0, 1.0);
+		Field2->WorldPosition += FVector(1.0, 1.0, 1.0);
+		Field3->WorldPosition += FVector(1.0, 1.0, 1.0);
+
+		UM2TestSet_Door* DoorSet = Registry->GetRecordSet<UM2TestSet_Door>();
+		ANANKE_TEST_NOT_NULL(TestFramework, DoorSet);
+
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->GetHandles().Num(), 3);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Door.Num(), 3);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Avatar.Num(), 3);
+
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Avatar[0].WorldPosition, FVector(2.0, 2.0, 2.0));
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Avatar[1].WorldPosition, FVector(3.0, 3.0, 3.0));
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Avatar[2].WorldPosition, FVector(4.0, 4.0, 4.0));
 	}
 
-	void Test_ProcessRecordSet()
+	void Test_GetSingletonField()
 	{
-		// TODO()
+		InitRegistry();
+
+		UM2TestSet_Player* PlayerSet = Registry->GetRecordSet<UM2TestSet_Player>();
+		ANANKE_TEST_NOT_NULL(TestFramework, PlayerSet);
+
+		// The singleton field is automatically created during the INITIALIZE_FIELD_WITH_SINGLETON call.
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.SetId.IsValid());
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.RecordId.IsValid());
+		ANANKE_TEST_EQUAL(TestFramework, PlayerSet->Avatar.Num(), 1);
+
+		// Calling GetAvatar repeatedly should not change anything
+		FM2TestField_Avatar* AvatarField = PlayerSet->GetAvatar();
+		ANANKE_TEST_NOT_NULL(TestFramework, AvatarField);
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.SetId.IsValid());
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.RecordId.IsValid());
+		ANANKE_TEST_EQUAL(TestFramework, PlayerSet->Avatar.Num(), 1);
+		AvatarField = nullptr;
+		AvatarField = PlayerSet->GetAvatar();
+		ANANKE_TEST_NOT_NULL(TestFramework, AvatarField);
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.SetId.IsValid());
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.RecordId.IsValid());
+		ANANKE_TEST_EQUAL(TestFramework, PlayerSet->Avatar.Num(), 1);
+
+		// Getting the field by handle should not change anything.
+		AvatarField = nullptr;
+		AvatarField = Registry->GetField<UM2TestSet_Player, FM2TestField_Avatar>(PlayerSet->SingletonHandle);
+		ANANKE_TEST_NOT_NULL(TestFramework, AvatarField);
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.SetId.IsValid());
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.RecordId.IsValid());
+		ANANKE_TEST_EQUAL(TestFramework, PlayerSet->Avatar.Num(), 1);
+
+		// Getting the field by array should not change anything.
+		TArrayView<FM2TestField_Avatar> AvatarArray = PlayerSet->GetFieldArray<FM2TestField_Avatar>();
+		ANANKE_TEST_EQUAL(TestFramework, AvatarArray.Num(), 1);
+	}
+
+	void Test_ClearSingletonField()
+	{
+		InitRegistry();
+
+		UM2TestSet_Player* PlayerSet = Registry->GetRecordSet<UM2TestSet_Player>();
+		ANANKE_TEST_NOT_NULL(TestFramework, PlayerSet);
+
+		// The singleton field is automatically created during the INITIALIZE_FIELD_WITH_SINGLETON call.
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.SetId.IsValid());
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.RecordId.IsValid());
+		ANANKE_TEST_EQUAL(TestFramework, PlayerSet->Avatar.Num(), 1);
+		
+		// Singleton records cannot be removed by handle.
+		PlayerSet->RemoveRecord(PlayerSet->SingletonHandle);
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.SetId.IsValid());
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.RecordId.IsValid());
+		ANANKE_TEST_EQUAL(TestFramework, PlayerSet->Avatar.Num(), 1);
+
+		// Calling ClearSingleton should flush the singleton data.
+		PlayerSet->ClearSingleton();
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.SetId.IsValid() == false);
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.RecordId.IsValid() == false);
+		ANANKE_TEST_EQUAL(TestFramework, PlayerSet->Avatar.Num(), 0);
+
+		// Calling Get{some field name}() regenerates the singleton.
+		PlayerSet->GetAvatar();
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.SetId.IsValid());
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.RecordId.IsValid());
+		ANANKE_TEST_EQUAL(TestFramework, PlayerSet->Avatar.Num(), 1);
 	}
 
 	void Test_ProcessArchetype()
 	{
-		// TODO()
+		InitRegistry();
+
+		UM2TestSet_Player* PlayerSet = Registry->GetRecordSet<UM2TestSet_Player>();
+		ANANKE_TEST_NOT_NULL(TestFramework, PlayerSet);
+
+		PlayerSet->GetAvatar()->WorldPosition = FVector(42.0, 42.0, 42.0);
+
+		TArray<UScriptStruct*> RequiredFields = TArray<UScriptStruct*>({FM2TestField_Avatar::StaticStruct()});
+		TArray<UScriptStruct*> ExcludedFields = TArray<UScriptStruct*>({FM2TestField_StaticEnvironment::StaticStruct()});
+		TArray<UM2RecordSet*> Result = Registry->GetAll(RequiredFields, ExcludedFields);
+
+		ANANKE_TEST_EQUAL(TestFramework, Result.Num(), 2);
+		
+		TSet<FVector> ExpectedPositions = TSet<FVector>({
+			FVector(1.0, 1.0, 1.0),
+			FVector(2.0, 2.0, 2.0),
+			FVector(3.0, 3.0, 3.0),
+			FVector(42.0, 42.0, 42.0),
+		});
+		int32 ExpectedFieldsProcessed = ExpectedPositions.Num();
+		int32 FieldsProcessed = 0;
+
+		// Note that RecordSet order is not guaranteed.
+		for (UM2RecordSet* RecordSet : Result)
+		{
+			ANANKE_TEST_NOT_NULL(TestFramework, RecordSet);
+
+			for (FM2TestField_Avatar& AvatarField : RecordSet->GetFieldArray<FM2TestField_Avatar>())
+			{
+				ANANKE_TEST_TRUE(TestFramework, ExpectedPositions.Contains(AvatarField.WorldPosition));
+				ExpectedPositions.Remove(AvatarField.WorldPosition);
+				FieldsProcessed++;
+			}
+		}
+
+		ANANKE_TEST_EQUAL(TestFramework, FieldsProcessed, ExpectedFieldsProcessed);
 	}
 
 	void Test_GetShared()
@@ -227,6 +425,14 @@ private:
 	// Test objects
 	TStrongObjectPtr<UWorld> TestWorld;
 	TStrongObjectPtr<UM2TestRegistry> Registry;
+
+	FM2RecordHandle TestRH_1;
+	FM2RecordHandle TestRH_2;
+	FM2RecordHandle TestRH_3;
+	FM2RecordHandle TestRH_4;
+	FM2RecordHandle TestRH_5;
+	FM2RecordHandle TestRH_6;
+	FM2RecordHandle TestRH_Invalid;
 };
 
 #define REGISTER_TEST_SUITE_FN(TargetTestName) Tests.Add(TEXT(#TargetTestName), &TestSuite::TargetTestName)
@@ -244,7 +450,8 @@ public:
 		REGISTER_TEST_SUITE_FN(Test_AddRecord);
 		REGISTER_TEST_SUITE_FN(Test_RemoveRecord);
 		REGISTER_TEST_SUITE_FN(Test_GetField);
-		REGISTER_TEST_SUITE_FN(Test_ProcessRecordSet);
+		REGISTER_TEST_SUITE_FN(Test_GetSingletonField);
+		REGISTER_TEST_SUITE_FN(Test_ClearSingletonField);
 		REGISTER_TEST_SUITE_FN(Test_ProcessArchetype);
 		REGISTER_TEST_SUITE_FN(Test_GetShared);
 	}
