@@ -31,9 +31,24 @@
 
 #include "Testing/M2TestTables.h"
 
-void UM2TestDoor::Initialize(FGuid NewSetId)
+void UM2TestSet_Player::Initialize(FGuid NewSetId)
 {
 	Super::Initialize(NewSetId);
 
-	M2_INITIALIZE_FIELD_WITH_SINGLETON(FM2TestDoorField, Door);
+	M2_INITIALIZE_FIELD_WITH_SINGLETON(FM2TestField_Avatar, Avatar);
+}
+
+void UM2TestSet_Door::Initialize(FGuid NewSetId)
+{
+	Super::Initialize(NewSetId);
+
+	M2_INITIALIZE_FIELD(FM2TestField_Avatar, Avatar);
+	M2_INITIALIZE_FIELD(FM2TestField_Door, Door);
+}
+
+void UM2TestSet_Excluded::Initialize(FGuid NewSetId)
+{
+	Super::Initialize(NewSetId);
+
+	M2_INITIALIZE_FIELD(FM2TestField_Avatar, Avatar);
 }

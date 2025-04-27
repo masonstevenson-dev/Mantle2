@@ -33,6 +33,7 @@
 
 #include "M2Types.generated.h"
 
+class TestSuite;
 class UM2EffectManager;
 class UM2Effect;
 class UM2RecordSet;
@@ -51,6 +52,7 @@ public:
 private:
 	friend UM2Registry;
 	friend UM2RecordSet;
+	friend TestSuite;
 	
 	UPROPERTY()
 	FGuid SetId = FGuid();

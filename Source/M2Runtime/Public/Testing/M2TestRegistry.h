@@ -30,69 +30,16 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
-#include "Foundation/M2RecordSet.h"
+#include "Foundation/M2Registry.h"
 
-#include "M2TestTables.generated.h"
-
-class TestSuite;
-
-USTRUCT()
-struct FM2TestField_Avatar
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY()
-	FVector WorldPosition = FVector::ZeroVector;
-};
-
-USTRUCT()
-struct FM2TestField_Door
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY()
-	bool bIsOpen = false;
-};
+#include "M2TestRegistry.generated.h"
 
 UCLASS()
-class UM2TestRecordSet : public UM2RecordSet { GENERATED_BODY() };
-
-UCLASS()
-class UM2TestSet_Player : public UM2TestRecordSet
+class UM2TestRegistry : public UM2Registry
 {
 	GENERATED_BODY()
 
-public:
-	friend TestSuite;
-	
-	virtual void Initialize(FGuid NewSetId) override;
-
-	M2_DECLARE_FIELD_WITH_SINGLETON(FM2TestField_Avatar, Avatar);
-};
-
-UCLASS()
-class UM2TestSet_Door : public UM2TestRecordSet
-{
-	GENERATED_BODY()
-
-public:
-	friend TestSuite;
-	
-	virtual void Initialize(FGuid NewSetId) override;
-
-	M2_DECLARE_FIELD(FM2TestField_Avatar, Avatar);
-	M2_DECLARE_FIELD(FM2TestField_Door, Door);
-};
-
-UCLASS()
-class UM2TestSet_Excluded : public UM2TestRecordSet
-{
-	GENERATED_BODY()
-
-public:
-	virtual void Initialize(FGuid NewSetId) override;
-
-	M2_DECLARE_FIELD(FM2TestField_Avatar, Avatar);
+protected:
+	virtual bool ExcludeTestSets() override { return false; }
+	virtual TArray<TSubclassOf<UM2RecordSet>> GetExcludedSets() override;
 };

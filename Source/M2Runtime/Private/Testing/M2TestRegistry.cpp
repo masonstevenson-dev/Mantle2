@@ -29,70 +29,13 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
-#include "Foundation/M2RecordSet.h"
+#include "Testing/M2TestRegistry.h"
 
-#include "M2TestTables.generated.h"
+#include "Testing/M2TestTables.h"
 
-class TestSuite;
-
-USTRUCT()
-struct FM2TestField_Avatar
+TArray<TSubclassOf<UM2RecordSet>> UM2TestRegistry::GetExcludedSets()
 {
-	GENERATED_BODY()
-
-public:
-	UPROPERTY()
-	FVector WorldPosition = FVector::ZeroVector;
-};
-
-USTRUCT()
-struct FM2TestField_Door
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY()
-	bool bIsOpen = false;
-};
-
-UCLASS()
-class UM2TestRecordSet : public UM2RecordSet { GENERATED_BODY() };
-
-UCLASS()
-class UM2TestSet_Player : public UM2TestRecordSet
-{
-	GENERATED_BODY()
-
-public:
-	friend TestSuite;
-	
-	virtual void Initialize(FGuid NewSetId) override;
-
-	M2_DECLARE_FIELD_WITH_SINGLETON(FM2TestField_Avatar, Avatar);
-};
-
-UCLASS()
-class UM2TestSet_Door : public UM2TestRecordSet
-{
-	GENERATED_BODY()
-
-public:
-	friend TestSuite;
-	
-	virtual void Initialize(FGuid NewSetId) override;
-
-	M2_DECLARE_FIELD(FM2TestField_Avatar, Avatar);
-	M2_DECLARE_FIELD(FM2TestField_Door, Door);
-};
-
-UCLASS()
-class UM2TestSet_Excluded : public UM2TestRecordSet
-{
-	GENERATED_BODY()
-
-public:
-	virtual void Initialize(FGuid NewSetId) override;
-
-	M2_DECLARE_FIELD(FM2TestField_Avatar, Avatar);
-};
+	TArray<TSubclassOf<UM2RecordSet>> ToReturn;
+	ToReturn.Add(UM2TestSet_Excluded::StaticClass());
+	return ToReturn;
+}

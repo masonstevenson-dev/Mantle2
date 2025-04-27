@@ -35,6 +35,8 @@
 
 #include "M2RecordSet.generated.h"
 
+class TestSuite;
+
 #define M2_INITIALIZE_FIELD(FieldType, FieldName)																					\
 	AddRecordFns.Add([this]() { return FieldName.AddDefaulted(); });																\
 	RemoveRecordFns.Add([this](int32 RecordIndex) { FieldName.RemoveAtSwap(RecordIndex); });										\
@@ -107,6 +109,8 @@ public:
 	void RemoveRecord(FM2RecordHandle& RecordHandle);
 
 protected:
+	friend TestSuite;
+	
 	FAnankeUntypedArrayView GetFieldInternal(UScriptStruct* FieldType);
 
 	UPROPERTY()

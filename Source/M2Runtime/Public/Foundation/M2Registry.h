@@ -35,6 +35,7 @@
 #include "M2Registry.generated.h"
 
 class UM2Engine;
+class TestSuite;
 
 UCLASS()
 class M2RUNTIME_API UM2Registry : public UObject
@@ -69,21 +70,6 @@ public:
 	 * @param RecordHandle - The handle for the record that should be removed.
 	 */
 	void RemoveRecord(FM2RecordHandle& RecordHandle);
-
-	/**
-	 *	Gets a compacted array of fields of a particular type for each record of a particular type.
-	 * 
-	 * @tparam RecordType - The type of record to fetch.
-	 * @tparam FieldType - The field type to fetch.
-	 * @return An ArrayView<FieldType> containing the matching record fields, or an empty ArrayView if no match was found.
-	 */
-	template <typename RecordType, typename FieldType>
-	TArrayView<FieldType> GetField()
-	{
-		static_assert(std::is_base_of_v<UM2RecordSet, RecordType>);
-		TObjectPtr<UM2RecordSet>* Result = SetsByType.Find(RecordType::StaticClass());
-		return Result ? Result->Get()->GetField<FieldType>() : TArrayView<FieldType>();
-	}
 
 	/**
 	 *	Fetches a field for an individual record.
@@ -196,6 +182,7 @@ public:
 
 protected:
 	friend UM2Engine;
+	friend TestSuite;
 	
 	// By default, the DB will be initialized with 1 copy of each class extending UM2RecordSet found in your codebase.
 	// to exclude a RecordSet from being constructed, override this fn.
