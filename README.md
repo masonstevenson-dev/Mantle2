@@ -36,7 +36,7 @@ This plugin uses my [AnankeCore](https://github.com/masonstevenson-dev/AnankeCor
 
 Install this plugin in your project's plugins folder. The folder structure should be: `YourProject/Plugins/Mantle2/Mantle2/Source`.
 
-
+<br>
 
 The plugin is enabled by default.
 
