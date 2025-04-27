@@ -4,7 +4,7 @@ Author: Mason Stevenson
 
 [https://masonstevenson.dev](https://masonstevenson.dev/)
 
-
+<br>
 
 Mantle2 is an entity system for Unreal Engine. The goal for this project is to:
 
@@ -18,7 +18,7 @@ Mantle2 is an entity system for Unreal Engine. The goal for this project is to:
 
 This project is still very much **WIP**. Use at your own risk.
 
-
+<br>
 
 ## Supported Engine Versions
 
