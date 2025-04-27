@@ -8,7 +8,7 @@ Author: Mason Stevenson
 
 Mantle2 is an entity system for Unreal Engine. The goal for this project is to:
 
-1) Provide some of the organizational benefits commonly provided by ECS architecture (query-by-composition, explicit tick order, per-entity operation framework).
+1) Provide some of the organizational benefits common in ECS architecture (query-by-composition, explicit tick order, per-entity operation framework).
    
 2) Pick the "low hanging fruit" for performance optimizations (aka, be cache friendly, but not like *that* cache friendly).
    
