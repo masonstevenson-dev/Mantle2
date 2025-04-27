@@ -18,7 +18,7 @@ Mantle2 is an entity system for Unreal Engine. The goal for this project is to:
    
 5) Provide standard patterns for single player indie games out of the box (effect system, perception system, item system, and more).
 
-
+<br>
 
 This project is still very much **WIP**. Use at your own risk.
 
