@@ -66,6 +66,9 @@ public:
 	float Opacity = 0.0f;
 };
 
+USTRUCT()
+struct FMTestTag_StaticEnvironment { GENERATED_BODY() };
+
 UCLASS()
 class UM2TestRecordSet : public UM2RecordSet { GENERATED_BODY() };
 

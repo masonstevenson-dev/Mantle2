@@ -78,7 +78,7 @@ TArray<UM2RecordSet*> UM2Registry::GetAll(TArray<TSubclassOf<UM2RecordSet>>& Rec
 	return Result;
 }
 
-TArray<UM2RecordSet*> UM2Registry::GetAll(TArray<UScriptStruct*>& MatchFields, TArray<UScriptStruct*>& ExcludeFields)
+TArray<UM2RecordSet*> UM2Registry::GetAll(TArray<UScriptStruct*>& Match, TArray<UScriptStruct*>& Exclude)
 {
 	TArray<UM2RecordSet*> Result;
 
@@ -86,7 +86,7 @@ TArray<UM2RecordSet*> UM2Registry::GetAll(TArray<UScriptStruct*>& MatchFields, T
 	{
 		UM2RecordSet* TargetSet = Iterator.Value();
 		
-		if (TargetSet->MatchArchetype(MatchFields, ExcludeFields))
+		if (TargetSet->MatchArchetype(Match, Exclude))
 		{
 			Result.Add(TargetSet);
 		}

@@ -43,7 +43,8 @@ class TestSuite;
 	GetFieldFns.Add(FieldType::StaticStruct(), [this](){ return FAnankeUntypedArrayView(FieldName.GetData(), FieldName.Num()); });	\
 	Archetype.Add(FieldType::StaticStruct());
 
-// TODO(): Implement M2_INITIALIZE_TAG(FieldType, FieldName). This should just add FieldType to a collection of supported tags. 
+#define M2_INITIALIZE_TAG(TagType) \
+	Archetype.Add(TagType::StaticStruct());
 
 #define M2_INITIALIZE_FIELD_WITH_SINGLETON(FieldType, FieldName)	\
 	M2_INITIALIZE_FIELD(FieldType, FieldName);						\
@@ -99,7 +100,7 @@ public:
 		return GetFieldInternal(ViewType::StaticStruct()).template GetArrayView<ViewType>();
 	}
 	
-	bool MatchArchetype(TArray<UScriptStruct*>& MatchFields, TArray<UScriptStruct*>& ExcludeFields);
+	bool MatchArchetype(TArray<UScriptStruct*>& Match, TArray<UScriptStruct*>& Exclude);
 
 	int32 Num() { return RecordIndexMap.Num(); }
 	bool HasRecord(const FM2RecordHandle& Handle)

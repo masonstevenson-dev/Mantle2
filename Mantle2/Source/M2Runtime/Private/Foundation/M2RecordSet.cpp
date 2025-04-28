@@ -42,16 +42,16 @@ void UM2RecordSet::Initialize(FGuid NewSetId)
 	Archetype.Empty();
 }
 
-bool UM2RecordSet::MatchArchetype(TArray<UScriptStruct*>& MatchFields, TArray<UScriptStruct*>& ExcludeFields)
+bool UM2RecordSet::MatchArchetype(TArray<UScriptStruct*>& Match, TArray<UScriptStruct*>& Exclude)
 {
-	for (UScriptStruct* FieldType : MatchFields)
+	for (UScriptStruct* FieldType : Match)
 	{
 		if (!Archetype.Contains(FieldType))
 		{
 			return false;
 		}
 	}
-	for (UScriptStruct* FieldType : ExcludeFields)
+	for (UScriptStruct* FieldType : Exclude)
 	{
 		if (Archetype.Contains(FieldType))
 		{
@@ -59,7 +59,7 @@ bool UM2RecordSet::MatchArchetype(TArray<UScriptStruct*>& MatchFields, TArray<US
 		}
 	}
 	
-	return (MatchFields.Num() + ExcludeFields.Num()) > 0;
+	return (Match.Num() + Exclude.Num()) > 0;
 }
 
 FM2RecordHandle UM2RecordSet::AddRecord()

@@ -381,9 +381,49 @@ public:
 
 		PlayerSet->GetAvatar()->WorldPosition = FVector(42.0, 42.0, 42.0);
 
-		TArray<UScriptStruct*> RequiredFields = TArray<UScriptStruct*>({FM2TestField_Avatar::StaticStruct()});
-		TArray<UScriptStruct*> ExcludedFields = TArray<UScriptStruct*>({FM2TestField_StaticEnvironment::StaticStruct()});
-		TArray<UM2RecordSet*> Result = Registry->GetAll(RequiredFields, ExcludedFields);
+		TArray<UScriptStruct*> RequiredStructs = TArray<UScriptStruct*>({FM2TestField_Avatar::StaticStruct()});
+		TArray<UScriptStruct*> ExcludedStructs = TArray<UScriptStruct*>({FM2TestField_StaticEnvironment::StaticStruct()});
+		TArray<UM2RecordSet*> Result = Registry->GetAll(RequiredStructs, ExcludedStructs);
+
+		ANANKE_TEST_EQUAL(TestFramework, Result.Num(), 2);
+		
+		TSet<FVector> ExpectedPositions = TSet<FVector>({
+			FVector(1.0, 1.0, 1.0),
+			FVector(2.0, 2.0, 2.0),
+			FVector(3.0, 3.0, 3.0),
+			FVector(42.0, 42.0, 42.0),
+		});
+		int32 ExpectedFieldsProcessed = ExpectedPositions.Num();
+		int32 FieldsProcessed = 0;
+
+		// Note that RecordSet order is not guaranteed.
+		for (UM2RecordSet* RecordSet : Result)
+		{
+			ANANKE_TEST_NOT_NULL(TestFramework, RecordSet);
+
+			for (FM2TestField_Avatar& AvatarField : RecordSet->GetFieldArray<FM2TestField_Avatar>())
+			{
+				ANANKE_TEST_TRUE(TestFramework, ExpectedPositions.Contains(AvatarField.WorldPosition));
+				ExpectedPositions.Remove(AvatarField.WorldPosition);
+				FieldsProcessed++;
+			}
+		}
+
+		ANANKE_TEST_EQUAL(TestFramework, FieldsProcessed, ExpectedFieldsProcessed);
+	}
+
+	void Test_ProcessArchetypeWithTags()
+	{
+		InitRegistry();
+
+		UM2TestSet_Player* PlayerSet = Registry->GetRecordSet<UM2TestSet_Player>();
+		ANANKE_TEST_NOT_NULL(TestFramework, PlayerSet);
+
+		PlayerSet->GetAvatar()->WorldPosition = FVector(42.0, 42.0, 42.0);
+
+		TArray<UScriptStruct*> RequiredStructs = TArray<UScriptStruct*>({FM2TestField_Avatar::StaticStruct()});
+		TArray<UScriptStruct*> ExcludedStructs = TArray<UScriptStruct*>({FMTestTag_StaticEnvironment::StaticStruct()});
+		TArray<UM2RecordSet*> Result = Registry->GetAll(RequiredStructs, ExcludedStructs);
 
 		ANANKE_TEST_EQUAL(TestFramework, Result.Num(), 2);
 		
@@ -453,6 +493,7 @@ public:
 		REGISTER_TEST_SUITE_FN(Test_GetSingletonField);
 		REGISTER_TEST_SUITE_FN(Test_ClearSingletonField);
 		REGISTER_TEST_SUITE_FN(Test_ProcessArchetype);
+		REGISTER_TEST_SUITE_FN(Test_ProcessArchetypeWithTags);
 		REGISTER_TEST_SUITE_FN(Test_GetShared);
 	}
 	

@@ -52,6 +52,7 @@ void UM2TestSet_Wall::Initialize(FGuid NewSetId)
 
 	M2_INITIALIZE_FIELD(FM2TestField_Avatar, Avatar);
 	M2_INITIALIZE_FIELD(FM2TestField_StaticEnvironment, StaticEnvironment);
+	M2_INITIALIZE_TAG(FMTestTag_StaticEnvironment);
 }
 
 void UM2TestSet_Excluded::Initialize(FGuid NewSetId)
