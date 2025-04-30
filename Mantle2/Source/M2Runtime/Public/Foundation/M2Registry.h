@@ -74,16 +74,14 @@ public:
 	/**
 	 *	Fetches a field for an individual record.
 	 * 
-	 * @tparam RecordType - The RecordSet type of the target record.
 	 * @tparam FieldType - The type of the target field.
 	 * @param Handle - The RecordHandle, which is a unique id for a target record.
 	 * @return Returns a pointer to the matching field if it exists, otherwise nullptr.
 	 */
-	template <typename RecordType, typename FieldType>
+	template <typename FieldType>
 	FieldType* GetField(FM2RecordHandle& Handle)
 	{
-		static_assert(std::is_base_of_v<UM2RecordSet, RecordType>);
-		TObjectPtr<UM2RecordSet>* Result = SetsByType.Find(RecordType::StaticClass());
+		TObjectPtr<UM2RecordSet>* Result = SetsById.Find(Handle.SetId);
 		return Result ? Result->Get()->GetField<FieldType>(Handle) : nullptr;
 	}
 	

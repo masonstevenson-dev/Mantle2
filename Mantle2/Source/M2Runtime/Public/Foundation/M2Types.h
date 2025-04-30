@@ -60,6 +60,8 @@ public:
 		RecordId = FGuid();
 	}
 
+	bool IsValid(UM2Registry* Registry);
+
 private:
 	friend UM2Registry;
 	friend UM2RecordSet;

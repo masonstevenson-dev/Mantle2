@@ -169,8 +169,8 @@ public:
 		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Avatar.Num(), 3);
 
 		FM2RecordHandle NewRecordHandle = Registry->AddRecord<UM2TestSet_Door>();
-		Registry->GetField<UM2TestSet_Door, FM2TestField_Door>(NewRecordHandle)->bIsOpen = true;
-		Registry->GetField<UM2TestSet_Door, FM2TestField_Avatar>(NewRecordHandle)->WorldPosition = FVector(42.0, 42.0, 42.0);
+		Registry->GetField<FM2TestField_Door>(NewRecordHandle)->bIsOpen = true;
+		Registry->GetField<FM2TestField_Avatar>(NewRecordHandle)->WorldPosition = FVector(42.0, 42.0, 42.0);
 
 		ANANKE_TEST_TRUE(TestFramework, NewRecordHandle.SetId.IsValid());
 		ANANKE_TEST_TRUE(TestFramework, NewRecordHandle.RecordId.IsValid());
@@ -238,8 +238,8 @@ public:
 		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[1].WorldPosition, FVector(3.0, 3.0, 3.0));
 
 		FM2RecordHandle NewRecordHandle = Registry->AddRecord<UM2TestSet_Door>();
-		Registry->GetField<UM2TestSet_Door, FM2TestField_Door>(NewRecordHandle)->bIsOpen = true;
-		Registry->GetField<UM2TestSet_Door, FM2TestField_Avatar>(NewRecordHandle)->WorldPosition = FVector(42.0, 42.0, 42.0);
+		Registry->GetField<FM2TestField_Door>(NewRecordHandle)->bIsOpen = true;
+		Registry->GetField<FM2TestField_Avatar>(NewRecordHandle)->WorldPosition = FVector(42.0, 42.0, 42.0);
 
 		DoorFields = DoorSet->GetFieldArray<FM2TestField_Door>();
 		AvatarFields = DoorSet->GetFieldArray<FM2TestField_Avatar>();
@@ -277,10 +277,10 @@ public:
 	{
 		InitRegistry();
 
-		FM2TestField_Avatar* Field1 = Registry->GetField<UM2TestSet_Door, FM2TestField_Avatar>(TestRH_1);
-		FM2TestField_Avatar* Field2 = Registry->GetField<UM2TestSet_Door, FM2TestField_Avatar>(TestRH_2);
-		FM2TestField_Avatar* Field3 = Registry->GetField<UM2TestSet_Door, FM2TestField_Avatar>(TestRH_3);
-		FM2TestField_Avatar* InvalidField = Registry->GetField<UM2TestSet_Door, FM2TestField_Avatar>(TestRH_Invalid);
+		FM2TestField_Avatar* Field1 = Registry->GetField<FM2TestField_Avatar>(TestRH_1);
+		FM2TestField_Avatar* Field2 = Registry->GetField<FM2TestField_Avatar>(TestRH_2);
+		FM2TestField_Avatar* Field3 = Registry->GetField<FM2TestField_Avatar>(TestRH_3);
+		FM2TestField_Avatar* InvalidField = Registry->GetField<FM2TestField_Avatar>(TestRH_Invalid);
 
 		ANANKE_TEST_NOT_NULL(TestFramework, Field1);
 		ANANKE_TEST_NOT_NULL(TestFramework, Field2);
@@ -330,7 +330,7 @@ public:
 
 		// Getting the field by handle should not change anything.
 		AvatarField = nullptr;
-		AvatarField = Registry->GetField<UM2TestSet_Player, FM2TestField_Avatar>(PlayerSet->SingletonHandle);
+		AvatarField = Registry->GetField<FM2TestField_Avatar>(PlayerSet->SingletonHandle);
 		ANANKE_TEST_NOT_NULL(TestFramework, AvatarField);
 		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.SetId.IsValid());
 		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.RecordId.IsValid());
