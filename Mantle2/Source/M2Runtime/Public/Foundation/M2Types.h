@@ -41,7 +41,7 @@ class UM2Registry;
 class UM2Script;
 
 USTRUCT()
-struct FM2RecordHandle
+struct M2RUNTIME_API FM2RecordHandle
 {
 	GENERATED_BODY()
 
@@ -60,7 +60,7 @@ public:
 		RecordId = FGuid();
 	}
 
-	bool IsValid(UM2Registry* Registry);
+	bool IsValid(UM2Registry* Registry) const;
 
 private:
 	friend UM2Registry;
@@ -75,7 +75,7 @@ private:
 };
 
 UENUM()
-enum class EM2EffectState
+enum class EM2EffectState: uint8
 {
 	Scheduled,
 	Tick,
@@ -83,22 +83,33 @@ enum class EM2EffectState
 	Delete
 };
 
+UENUM()
+enum class EM2EffectTriggerResponse
+{
+	Continue,
+	Done,
+	Cancel
+};
+
 USTRUCT()
-struct FM2EffectContext
+struct M2RUNTIME_API FM2EffectContext
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY()
+	UPROPERTY(Transient)
 	TObjectPtr<UWorld> World;
 
+	UPROPERTY(Transient)
+	TObjectPtr<UM2Registry> Registry;
+
 	// frame time, in seconds.
-	UPROPERTY()
+	UPROPERTY(Transient)
 	float DeltaTime = 0.0f;
 };
 
-USTRUCT()
-struct FM2EffectMetadata
+USTRUCT(BlueprintType)
+struct M2RUNTIME_API FM2EffectMetadata
 {
 	GENERATED_BODY()
 
@@ -132,21 +143,53 @@ public:
 		return NewMetadata;
 	}
 
-	FM2EffectMetadata& WithInstanceData(FM2RecordHandle& RecordHandle)
-	{
-		InstanceDataHandle = RecordHandle;
-		return *this;
-	}
-
 	FM2EffectMetadata& WithTimeLimit(float InTimeLimit)
 	{
-		MaxDuration = InTimeLimit < 0.0 ? kUnlimitedDuration : InTimeLimit;
+		if (State == EM2EffectState::Scheduled)
+		{
+			MaxDuration = InTimeLimit < 0.0 ? kUnlimitedDuration : InTimeLimit;
+		}
+		
 		return *this;
 	}
 
 	FM2EffectMetadata& WithTriggerLimit(int32 InTriggers)
 	{
-		TriggerLimit = InTriggers < 0 ? kUnlimitedTriggers : InTriggers;
+		if (State == EM2EffectState::Scheduled)
+		{
+			TriggerLimit = InTriggers < 0 ? kUnlimitedTriggers : InTriggers;
+		}
+		
+		return *this;
+	}
+
+	FM2EffectMetadata& WithInstigator(const FM2RecordHandle& RecordHandle)
+	{
+		if (State == EM2EffectState::Scheduled)
+		{
+			Instigator = RecordHandle;
+		}
+		
+		return *this;
+	}
+
+	FM2EffectMetadata& WithTarget(const FM2RecordHandle& RecordHandle)
+	{
+		if (State == EM2EffectState::Scheduled)
+		{
+			Target = RecordHandle;
+		}
+		
+		return *this;
+	}
+
+	FM2EffectMetadata& WithInstanceData(const FM2RecordHandle& RecordHandle)
+	{
+		if (State == EM2EffectState::Scheduled)
+		{
+			InstanceDataHandle = RecordHandle;
+		}
+		
 		return *this;
 	}
 
@@ -168,6 +211,21 @@ public:
 	bool HasEverTicked()
 	{
 		return TriggerCount > 0;
+	}
+
+	FM2RecordHandle GetInstigator() const
+	{
+		return Instigator;
+	}
+	
+	FM2RecordHandle GetTarget() const
+	{
+		return Target;
+	}
+
+	FM2RecordHandle GetInstanceData() const
+	{
+		return InstanceDataHandle;
 	}
 
 protected:
@@ -203,11 +261,14 @@ protected:
 	UPROPERTY()
 	EM2EffectState State = EM2EffectState::Scheduled;
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float TriggerRateSec = 0.0f;
 	
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float MaxDuration = 0.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 TriggerLimit = 0;
 
 	UPROPERTY()
 	float TotalElapsedTime = 0.0f;
@@ -216,11 +277,14 @@ protected:
 	float TriggerElapsedTime = 0.0f;
 
 	UPROPERTY()
-	uint32 TriggerCount = 0;
+	int32 TriggerCount = 0;
 
 	UPROPERTY()
-	uint32 TriggerLimit = 0;
+	FM2RecordHandle Instigator = FM2RecordHandle();
 
+	UPROPERTY()
+	FM2RecordHandle Target = FM2RecordHandle();
+	
 	UPROPERTY()
 	FM2RecordHandle InstanceDataHandle = FM2RecordHandle();
 };

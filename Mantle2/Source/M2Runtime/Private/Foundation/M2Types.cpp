@@ -33,7 +33,7 @@
 
 #include "Foundation/M2Registry.h"
 
-bool FM2RecordHandle::IsValid(UM2Registry* Registry)
+bool FM2RecordHandle::IsValid(UM2Registry* Registry) const
 {
 	return Registry ? Registry->HasRecord(*this) : false;
 }

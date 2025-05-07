@@ -35,7 +35,8 @@ void UM2TestSet_Player::Initialize(FGuid NewSetId)
 {
 	Super::Initialize(NewSetId);
 
-	M2_INITIALIZE_FIELD_WITH_SINGLETON(FM2TestField_Avatar, Avatar);
+	bInitWithSingleton = true;
+	M2_INITIALIZE_FIELD(FM2TestField_Avatar, Avatar);
 }
 
 void UM2TestSet_Door::Initialize(FGuid NewSetId)

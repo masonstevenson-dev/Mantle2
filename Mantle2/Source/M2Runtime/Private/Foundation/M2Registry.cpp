@@ -126,6 +126,7 @@ void UM2Registry::ConstructRecordSets()
 		auto* NewRecordSet = NewObject<UM2RecordSet>(this, TargetClass);
 		FGuid NewId = FGuid::NewGuid();
 		NewRecordSet->Initialize(NewId);
+		NewRecordSet->FinishInitialize();
 		SetsById.Add(NewId, NewRecordSet);
 		SetsByType.Add(TargetClass, NewRecordSet);
 	}

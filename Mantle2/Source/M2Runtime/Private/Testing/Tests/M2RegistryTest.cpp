@@ -38,6 +38,7 @@
 #include "Misc/AutomationTest.h"
 #include "Testing/M2TestRegistry.h"
 #include "Testing/M2TestTables.h"
+#include "Testing/Fakes/AnankeTestObject.h"
 #include "Testing/Macros/AnankeTestMacros.h"
 
 #if WITH_EDITOR
@@ -155,6 +156,27 @@ public:
 			ANANKE_TEST_NOT_NULL(TestFramework, RecordSet);
 			ANANKE_TEST_TRUE(TestFramework, Registry->SetsByType.Contains(RecordSet->GetClass()));
 		}
+	}
+
+	void Test_RecordSetHasField()
+	{
+		Registry->ConstructRecordSets();
+
+		auto* DoorSet = Registry->GetRecordSet<UM2TestSet_Door>();
+		ANANKE_TEST_TRUE(TestFramework, DoorSet->HasField<FM2TestField_Door>());
+		ANANKE_TEST_TRUE(TestFramework, DoorSet->HasField<FM2TestField_Avatar>());
+		ANANKE_TEST_TRUE(TestFramework, DoorSet->HasField<FM2TestField_StaticEnvironment>() == false);
+		ANANKE_TEST_TRUE(TestFramework, DoorSet->HasField(FM2TestField_Door::StaticStruct()));
+		ANANKE_TEST_TRUE(TestFramework, DoorSet->HasField(FM2TestField_Avatar::StaticStruct()));
+		ANANKE_TEST_TRUE(TestFramework, DoorSet->HasField(FM2TestField_StaticEnvironment::StaticStruct()) == false);
+
+		auto* WallSet = Registry->GetRecordSet<UM2TestSet_Wall>();
+		ANANKE_TEST_TRUE(TestFramework, WallSet->HasField<FM2TestField_Door>() == false);
+		ANANKE_TEST_TRUE(TestFramework, WallSet->HasField<FM2TestField_Avatar>());
+		ANANKE_TEST_TRUE(TestFramework, WallSet->HasField<FM2TestField_StaticEnvironment>());
+		ANANKE_TEST_TRUE(TestFramework, WallSet->HasField(FM2TestField_Door::StaticStruct()) == false);
+		ANANKE_TEST_TRUE(TestFramework, WallSet->HasField(FM2TestField_Avatar::StaticStruct()));
+		ANANKE_TEST_TRUE(TestFramework, WallSet->HasField(FM2TestField_StaticEnvironment::StaticStruct()));
 	}
 
 	void Test_AddRecord()
@@ -310,19 +332,20 @@ public:
 		UM2TestSet_Player* PlayerSet = Registry->GetRecordSet<UM2TestSet_Player>();
 		ANANKE_TEST_NOT_NULL(TestFramework, PlayerSet);
 
-		// The singleton field is automatically created during the INITIALIZE_FIELD_WITH_SINGLETON call.
+		// The singleton field is automatically created when bInitWithSingleton is set to true.
+		ANANKE_TEST_TRUE(TestFramework, PlayerSet->bInitWithSingleton);
 		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.SetId.IsValid());
 		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.RecordId.IsValid());
 		ANANKE_TEST_EQUAL(TestFramework, PlayerSet->Avatar.Num(), 1);
 
 		// Calling GetAvatar repeatedly should not change anything
-		FM2TestField_Avatar* AvatarField = PlayerSet->GetAvatar();
+		FM2TestField_Avatar* AvatarField = PlayerSet->GetSingletonField<FM2TestField_Avatar>();
 		ANANKE_TEST_NOT_NULL(TestFramework, AvatarField);
 		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.SetId.IsValid());
 		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.RecordId.IsValid());
 		ANANKE_TEST_EQUAL(TestFramework, PlayerSet->Avatar.Num(), 1);
 		AvatarField = nullptr;
-		AvatarField = PlayerSet->GetAvatar();
+		AvatarField = PlayerSet->GetSingletonField<FM2TestField_Avatar>();
 		ANANKE_TEST_NOT_NULL(TestFramework, AvatarField);
 		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.SetId.IsValid());
 		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.RecordId.IsValid());
@@ -366,7 +389,7 @@ public:
 		ANANKE_TEST_EQUAL(TestFramework, PlayerSet->Avatar.Num(), 0);
 
 		// Calling Get{some field name}() regenerates the singleton.
-		PlayerSet->GetAvatar();
+		PlayerSet->GetSingletonField<FM2TestField_Avatar>();
 		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.SetId.IsValid());
 		ANANKE_TEST_TRUE(TestFramework, PlayerSet->SingletonHandle.RecordId.IsValid());
 		ANANKE_TEST_EQUAL(TestFramework, PlayerSet->Avatar.Num(), 1);
@@ -379,7 +402,7 @@ public:
 		UM2TestSet_Player* PlayerSet = Registry->GetRecordSet<UM2TestSet_Player>();
 		ANANKE_TEST_NOT_NULL(TestFramework, PlayerSet);
 
-		PlayerSet->GetAvatar()->WorldPosition = FVector(42.0, 42.0, 42.0);
+		PlayerSet->GetSingletonField<FM2TestField_Avatar>()->WorldPosition = FVector(42.0, 42.0, 42.0);
 
 		TArray<UScriptStruct*> RequiredStructs = TArray<UScriptStruct*>({FM2TestField_Avatar::StaticStruct()});
 		TArray<UScriptStruct*> ExcludedStructs = TArray<UScriptStruct*>({FM2TestField_StaticEnvironment::StaticStruct()});
@@ -419,7 +442,7 @@ public:
 		UM2TestSet_Player* PlayerSet = Registry->GetRecordSet<UM2TestSet_Player>();
 		ANANKE_TEST_NOT_NULL(TestFramework, PlayerSet);
 
-		PlayerSet->GetAvatar()->WorldPosition = FVector(42.0, 42.0, 42.0);
+		PlayerSet->GetSingletonField<FM2TestField_Avatar>()->WorldPosition = FVector(42.0, 42.0, 42.0);
 
 		TArray<UScriptStruct*> RequiredStructs = TArray<UScriptStruct*>({FM2TestField_Avatar::StaticStruct()});
 		TArray<UScriptStruct*> ExcludedStructs = TArray<UScriptStruct*>({FMTestTag_StaticEnvironment::StaticStruct()});
@@ -454,7 +477,20 @@ public:
 
 	void Test_GetShared()
 	{
-		// TODO()
+		UM2Registry* TestRegistry = NewObject<UM2Registry>();
+		
+	    UAnankeTestObject* SharedObject1 = TestRegistry->GetShared<UAnankeTestObject>();
+	    ANANKE_TEST_NOT_NULL(TestFramework, SharedObject1);
+	    ANANKE_TEST_TRUE(TestFramework, SharedObject1->IsValidLowLevel());
+		ANANKE_TEST_EQUAL(TestFramework, TestRegistry->SharedObjects.Num(), 1);
+		
+	    UAnankeTestObject* SharedObject2 = TestRegistry->GetShared<UAnankeTestObject>();
+	    ANANKE_TEST_NOT_NULL(TestFramework, SharedObject2);
+	    ANANKE_TEST_TRUE(TestFramework, SharedObject2->IsValidLowLevel());
+		ANANKE_TEST_EQUAL(TestFramework, TestRegistry->SharedObjects.Num(), 1);
+	    ANANKE_TEST_TRUE(TestFramework, SharedObject1 == SharedObject2);
+		
+	    TestRegistry->SharedObjects.Empty();
 	}
 
 	// IMPORTANT! Be sure to register your fn inside your AutomationTest class below!
@@ -487,6 +523,7 @@ public:
 		REGISTER_TEST_SUITE_FN(Test_SmokeTest);
 		REGISTER_TEST_SUITE_FN(Test_TestSetsExcludedFromStandardRegistry);
 		REGISTER_TEST_SUITE_FN(Test_ConstructRecordSets);
+		REGISTER_TEST_SUITE_FN(Test_RecordSetHasField);
 		REGISTER_TEST_SUITE_FN(Test_AddRecord);
 		REGISTER_TEST_SUITE_FN(Test_RemoveRecord);
 		REGISTER_TEST_SUITE_FN(Test_GetField);
@@ -495,6 +532,8 @@ public:
 		REGISTER_TEST_SUITE_FN(Test_ProcessArchetype);
 		REGISTER_TEST_SUITE_FN(Test_ProcessArchetypeWithTags);
 		REGISTER_TEST_SUITE_FN(Test_GetShared);
+
+		// TODO(): Add tests for aliased fields.
 	}
 	
 	virtual uint32 GetTestFlags() const override

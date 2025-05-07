@@ -29,27 +29,18 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Components/M2AvatarComponent.h"
+#pragma once
+#include "Foundation/M2RecordSet.h"
 
-#include "Fields/Avatar.h"
+#include "M2EffectInstance.generated.h"
 
-UM2AvatarComponent::UM2AvatarComponent(const FObjectInitializer& Initializer): Super(Initializer)
+UCLASS()
+class M2RUNTIME_API UM2EffectInstance : public UM2RecordSet
 {
-	bWantsInitializeComponent = true; // needed for UninitializeComponent
-}
+	GENERATED_BODY()
 
-void UM2AvatarComponent::UninitializeComponent()
-{
-	Super::UninitializeComponent();
-	
-	if (bRemoveRecordOnDestruction)
-	{
-		Registry->RemoveRecord(RecordHandle);
-	}
-	else if (auto* AvatarField = Registry->GetField<FLD_AvatarActor>(RecordHandle))
-	{
-		AvatarField->AvatarActor = nullptr;
-	}
+public:
+	virtual void Initialize(FGuid NewSetId) override;
 
-	RecordHandle = FM2RecordHandle();
-}
+	M2_DECLARE_FIELD(FM2EffectMetadata, Metadata);
+};

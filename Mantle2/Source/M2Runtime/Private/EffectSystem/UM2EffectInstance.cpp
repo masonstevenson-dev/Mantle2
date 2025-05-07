@@ -29,27 +29,11 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Components/M2AvatarComponent.h"
+#include "EffectSystem/M2EffectInstance.h"
 
-#include "Fields/Avatar.h"
-
-UM2AvatarComponent::UM2AvatarComponent(const FObjectInitializer& Initializer): Super(Initializer)
+void UM2EffectInstance::Initialize(FGuid NewSetId)
 {
-	bWantsInitializeComponent = true; // needed for UninitializeComponent
-}
+	Super::Initialize(NewSetId);
 
-void UM2AvatarComponent::UninitializeComponent()
-{
-	Super::UninitializeComponent();
-	
-	if (bRemoveRecordOnDestruction)
-	{
-		Registry->RemoveRecord(RecordHandle);
-	}
-	else if (auto* AvatarField = Registry->GetField<FLD_AvatarActor>(RecordHandle))
-	{
-		AvatarField->AvatarActor = nullptr;
-	}
-
-	RecordHandle = FM2RecordHandle();
+	M2_INITIALIZE_FIELD(FM2EffectMetadata, Metadata);
 }

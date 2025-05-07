@@ -42,6 +42,14 @@ void UM2RecordSet::Initialize(FGuid NewSetId)
 	Archetype.Empty();
 }
 
+void UM2RecordSet::FinishInitialize()
+{
+	if (bInitWithSingleton)
+	{
+		RefreshSingleton();	
+	}
+}
+
 bool UM2RecordSet::MatchArchetype(TArray<UScriptStruct*>& Match, TArray<UScriptStruct*>& Exclude)
 {
 	for (UScriptStruct* FieldType : Match)
@@ -135,5 +143,13 @@ void UM2RecordSet::RemoveRecordInternal(FM2RecordHandle& RecordHandle)
 		// a swap should have happened. Sanity check here to make sure the correct record was swapped.
 		check(RecordHandles[RecordIndex].RecordId == LastId);
 		RecordIndexMap[LastId] = RecordIndex;	
+	}
+}
+
+void UM2RecordSet::RefreshSingleton()
+{
+	if (!HasRecord(SingletonHandle))
+	{
+		SingletonHandle = AddRecord();
 	}
 }

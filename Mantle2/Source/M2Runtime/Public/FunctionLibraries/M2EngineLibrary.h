@@ -30,17 +30,17 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
-#include "Foundation/M2RecordSet.h"
+#include "Foundation/M2Registry.h"
+#include "UObject/ObjectPtr.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
 
-#include "M2EffectTracker.generated.h"
+#include "M2EngineLibrary.generated.h"
 
 UCLASS()
-class UM2EffectTracker : public UM2RecordSet
+class M2RUNTIME_API UM2EngineLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
 public:
-	virtual void Initialize(FGuid NewSetId) override;
-
-	M2_DECLARE_FIELD(FM2EffectMetadata, Metadata);
+	static UM2Registry* GetRegistry(UGameInstance* GameInstance);
 };

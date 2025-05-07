@@ -82,7 +82,7 @@ public:
 	
 	virtual void Initialize(FGuid NewSetId) override;
 
-	M2_DECLARE_FIELD_WITH_SINGLETON(FM2TestField_Avatar, Avatar);
+	M2_DECLARE_FIELD(FM2TestField_Avatar, Avatar);
 };
 
 UCLASS()

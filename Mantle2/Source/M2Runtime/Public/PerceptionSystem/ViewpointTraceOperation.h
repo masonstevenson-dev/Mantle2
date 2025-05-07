@@ -28,12 +28,68 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#pragma once
+#include "Fields/VPTBase.h"
+#include "Foundation/M2Operation.h"
 
-#include "EffectSystem/M2EffectTracker.h"
+#include "ViewpointTraceOperation.generated.h"
 
-void UM2EffectTracker::Initialize(FGuid NewSetId)
+namespace M2
 {
-	Super::Initialize(NewSetId);
+	struct VPTOptions
+	{
+		float ScanRange = 200.0f;
+		double ScanRateSec = 0.01;
+		ECollisionChannel TraceChannel = ECC_Visibility;
+		bool bDrawDebugGeometry = false;
+	};
+	
+	struct VPTDebugSphereData
+	{
+		float Radius = 5.0f;
+		int32 Segments = 16;
+		bool bPersistentLines = false;
+		float LifeTime = -1.0; 
+		uint8 DepthPriority = 0; 
+		float Thickness = 0.0;
 
-	M2_INITIALIZE_FIELD(FM2EffectMetadata, Metadata);
+		FColor DefaultColor = FColor::Black;
+		FColor NoHitsColor = FColor::Red;
+		FColor UnknownColor = FColor::Yellow;
+		FColor HitColor = FColor::Green;
+	};
 }
+
+UCLASS()
+class M2RUNTIME_API UViewpointTraceOperation : public UM2Operation
+{
+	GENERATED_BODY()
+
+public:
+	virtual void Initialize(UM2Registry* Registry) override;
+	virtual void PerformOperation(FM2OperationContext& Ctx) override;
+	
+protected:
+	virtual TArrayView<FLD_VPTBase> GetVPTData(UM2RecordSet* ResultSet);
+	
+	virtual void ProcessTraceResults(
+		FM2OperationContext& Ctx,
+		FM2RecordHandle& SourceHandle,
+		FLD_VPTBase& SourceVPT,
+		FM2RecordHandle& Hit,
+		TArray<FM2RecordHandle>& Overlaps
+	) {}
+	
+	void PerformLineTrace(
+		FM2OperationContext& Ctx,
+		AActor& ViewpointActor,
+		FM2RecordHandle& OutHit,
+		TArray<FM2RecordHandle>& OutOverlaps
+	);
+
+	// init these in Operation::Initialize()
+	TArray<UScriptStruct*> IncludeFields;
+	TArray<UScriptStruct*> ExcludeFields;
+	M2::VPTOptions TraceOptions;
+	M2::VPTDebugSphereData DebugData;
+};

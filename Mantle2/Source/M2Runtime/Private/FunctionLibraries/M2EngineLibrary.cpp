@@ -29,27 +29,12 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Components/M2AvatarComponent.h"
+#include "FunctionLibraries/M2EngineLibrary.h"
 
-#include "Fields/Avatar.h"
+#include "Foundation/M2Engine.h"
 
-UM2AvatarComponent::UM2AvatarComponent(const FObjectInitializer& Initializer): Super(Initializer)
+UM2Registry* UM2EngineLibrary::GetRegistry(UGameInstance* GameInstance)
 {
-	bWantsInitializeComponent = true; // needed for UninitializeComponent
-}
-
-void UM2AvatarComponent::UninitializeComponent()
-{
-	Super::UninitializeComponent();
-	
-	if (bRemoveRecordOnDestruction)
-	{
-		Registry->RemoveRecord(RecordHandle);
-	}
-	else if (auto* AvatarField = Registry->GetField<FLD_AvatarActor>(RecordHandle))
-	{
-		AvatarField->AvatarActor = nullptr;
-	}
-
-	RecordHandle = FM2RecordHandle();
+	auto* MantleEngine = UGameInstance::GetSubsystem<UM2Engine>(GameInstance);
+	return MantleEngine ? MantleEngine->GetRegistry() : nullptr;
 }

@@ -66,11 +66,6 @@ public:
 	
 	void Run(FM2OperationContext& Ctx);
 
-	virtual TSet<UScriptStruct*> GetRequiredComponents()
-	{
-		return TSet<UScriptStruct*>();
-	}
-
 protected:
 	virtual void PerformOperation(FM2OperationContext& Ctx);
 };

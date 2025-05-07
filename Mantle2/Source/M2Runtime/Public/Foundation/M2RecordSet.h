@@ -37,18 +37,26 @@
 
 class TestSuite;
 
-#define M2_INITIALIZE_FIELD(FieldType, FieldName)																					\
-	AddRecordFns.Add([this]() { return FieldName.AddDefaulted(); });																\
-	RemoveRecordFns.Add([this](int32 RecordIndex) { FieldName.RemoveAtSwap(RecordIndex); });										\
-	GetFieldFns.Add(FieldType::StaticStruct(), [this](){ return FAnankeUntypedArrayView(FieldName.GetData(), FieldName.Num()); });	\
-	Archetype.Add(FieldType::StaticStruct());
+#define I_M2_INITIALIZE_FIELD(TypeOrAlias, FieldName)																					\
+	AddRecordFns.Add([this]() { return FieldName.AddDefaulted(); });																	\
+	RemoveRecordFns.Add([this](int32 RecordIndex) { FieldName.RemoveAtSwap(RecordIndex); });											\
+	GetFieldFns.Add(TypeOrAlias::StaticStruct(), [this](){ return FAnankeUntypedArrayView(FieldName.GetData(), FieldName.Num()); });	\
+	Archetype.Add(TypeOrAlias::StaticStruct());
+
+// Note: We include Check##FieldType as a simple way of forcing a compilation error if:
+//			1) The field "FieldName" was declared with a different type other than FieldType.
+//			2) Any other field was initialized with the same field type. If you want to initialize multiple fields with
+//			   the same type, use M2_INITIALIZE_FIELD_WITH_ALIAS instead.
+#define M2_INITIALIZE_FIELD(FieldType, FieldName)		\
+	FieldType* Check##FieldType = FieldName.GetData();	\
+	I_M2_INITIALIZE_FIELD(FieldType, FieldName)
+
+#define M2_INITIALIZE_FIELD_WITH_ALIAS(FieldType, TypeAlias, FieldName)	\
+	FieldType* Check##FieldType##TypeAlias = FieldName.GetData();		\
+	I_M2_INITIALIZE_FIELD(TypeAlias, FieldName)
 
 #define M2_INITIALIZE_TAG(TagType) \
 	Archetype.Add(TagType::StaticStruct());
-
-#define M2_INITIALIZE_FIELD_WITH_SINGLETON(FieldType, FieldName)	\
-	M2_INITIALIZE_FIELD(FieldType, FieldName);						\
-	Get##FieldName();
 
 // Note: M2_DECLARE_FIELD should be placed in a public: section.
 #define M2_DECLARE_FIELD(FieldType, FieldName)					\
@@ -57,18 +65,6 @@ protected:														\
 	TArray<FieldType> FieldName;								\
 public:
 
-// The same as DECLARE_FIELD, but also adds an accessor for singleton fields.
-#define M2_DECLARE_FIELD_WITH_SINGLETON(FieldType, FieldName)	\
-	M2_DECLARE_FIELD(FieldType, FieldName);						\
-	UFUNCTION()													\
-	FieldType* Get##FieldName()									\
-	{															\
-		if (!HasRecord(SingletonHandle))						\
-		{														\
-			SingletonHandle = AddRecord();						\
-		}														\
-		return GetField<FieldType>(SingletonHandle);			\
-	}															
 
 UCLASS()
 class M2RUNTIME_API UM2RecordSet : public UObject
@@ -77,6 +73,7 @@ class M2RUNTIME_API UM2RecordSet : public UObject
 
 public:
 	virtual void Initialize(FGuid NewSetId);
+	virtual void FinishInitialize();
 
 	TArrayView<FM2RecordHandle> GetHandles()
 	{
@@ -91,7 +88,50 @@ public:
 			return nullptr;
 		}
 
-		return &GetFieldArray<ViewType>()[RecordIndexMap.FindChecked(Handle.RecordId)];
+		TArrayView<ViewType> FieldArray = GetFieldArray<ViewType>();
+		if (!FieldArray.GetData())
+		{
+			return nullptr;
+		}
+		
+		return &FieldArray[RecordIndexMap.FindChecked(Handle.RecordId)];
+	}
+
+	template <typename ViewType, typename TypeAlias>
+	ViewType* GetField(const FM2RecordHandle& Handle)
+	{
+		if (!HasRecord(Handle))
+		{
+			return nullptr;
+		}
+
+		TArrayView<ViewType> FieldArray = GetFieldArray<ViewType, TypeAlias>();
+		if (!FieldArray.GetData())
+		{
+			return nullptr;
+		}
+		
+		return &FieldArray[RecordIndexMap.FindChecked(Handle.RecordId)];
+	}
+
+	template <typename ViewType>
+	ViewType* GetSingletonField()
+	{
+		RefreshSingleton();
+		return GetField<ViewType>(SingletonHandle);
+	}
+
+	template <typename ViewType, typename TypeAlias>
+	ViewType* GetSingletonField()
+	{
+		RefreshSingleton();
+		return GetField<ViewType, TypeAlias>(SingletonHandle);
+	}
+
+	FM2RecordHandle GetSingletonHandle()
+	{
+		RefreshSingleton();
+		return SingletonHandle;
 	}
 	
 	template <typename ViewType>
@@ -99,13 +139,33 @@ public:
 	{
 		return GetFieldInternal(ViewType::StaticStruct()).template GetArrayView<ViewType>();
 	}
+
+	template <typename ViewType, typename TypeAlias>
+	TArrayView<ViewType> GetFieldArray()
+	{
+		return GetFieldInternal(TypeAlias::StaticStruct()).template GetArrayView<ViewType>();
+	}
 	
 	bool MatchArchetype(TArray<UScriptStruct*>& Match, TArray<UScriptStruct*>& Exclude);
 
-	int32 Num() { return RecordIndexMap.Num(); }
+	int32 Num()
+	{
+		return RecordIndexMap.Num();
+	}
+	
 	bool HasRecord(const FM2RecordHandle& Handle)
 	{
 		return Handle.SetId.IsValid() && Handle.SetId == SetId && Handle.RecordId.IsValid() && RecordIndexMap.Contains(Handle.RecordId);
+	}
+
+	template <typename ViewType>
+	bool HasField()
+	{
+		return GetFieldFns.Contains(ViewType::StaticStruct());
+	}
+	bool HasField(UScriptStruct* FieldType)
+	{
+		return GetFieldFns.Contains(FieldType);
 	}
 
 	FM2RecordHandle AddRecord();
@@ -119,6 +179,8 @@ protected:
 	
 	FAnankeUntypedArrayView GetFieldInternal(UScriptStruct* FieldType);
 	void RemoveRecordInternal(FM2RecordHandle& RecordHandle);
+
+	void RefreshSingleton();
 
 	UPROPERTY()
 	FGuid SetId = FGuid();
@@ -139,4 +201,7 @@ protected:
 	// code will conveniently break in every place where you called GetMyField(), GetMyOtherField(), etc.
 	UPROPERTY()
 	FM2RecordHandle SingletonHandle;
+
+	UPROPERTY()
+	bool bInitWithSingleton = false;
 };

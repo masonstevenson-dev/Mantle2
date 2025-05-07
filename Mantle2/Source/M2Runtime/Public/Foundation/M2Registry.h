@@ -53,6 +53,7 @@ public:
 
 	/**
 	 * Adds a record of the target type to the registry.
+	 * 
 	 * @tparam RecordType - The type of record to add.
 	 * @return - Returns a valid RecordHandle if the record was added.
 	 */
@@ -62,6 +63,21 @@ public:
 		static_assert(std::is_base_of_v<UM2RecordSet, RecordType>);
 		TObjectPtr<UM2RecordSet>* Result = SetsByType.Find(RecordType::StaticClass());
 		return Result ? Result->Get()->AddRecord() : FM2RecordHandle();
+	}
+
+	/**
+	 * Gets a handle for the singleton record associated with a particular record type, or creates one and then returns
+	 * the newly created handle if no singleton currently exists.
+	 * 
+	 * @tparam RecordType - The type of record to add.
+	 * @return - Returns a valid RecordHandle.
+	 */
+	template <typename RecordType>
+	FM2RecordHandle GetSingletonHandle()
+	{
+		static_assert(std::is_base_of_v<UM2RecordSet, RecordType>);
+		TObjectPtr<UM2RecordSet>* Result = SetsByType.Find(RecordType::StaticClass());
+		return Result ? Result->Get()->GetSingletonHandle() : FM2RecordHandle();
 	}
 
 	/**
@@ -79,10 +95,25 @@ public:
 	 * @return Returns a pointer to the matching field if it exists, otherwise nullptr.
 	 */
 	template <typename FieldType>
-	FieldType* GetField(FM2RecordHandle& Handle)
+	FieldType* GetField(const FM2RecordHandle& Handle)
 	{
 		TObjectPtr<UM2RecordSet>* Result = SetsById.Find(Handle.SetId);
 		return Result ? Result->Get()->GetField<FieldType>(Handle) : nullptr;
+	}
+
+	/**
+	 * Fetches an aliased field for an individual record.
+	 * 
+	 * @tparam FieldType - The type of field to fetch.
+	 * @tparam TypeAlias - The alias for the field to fetch.
+	 * @param Handle - The RecordHandle, which is a unique id for a target record.
+	 * @return Returns a pointer to the matching field if it exists, otherwise nullptr.
+	 */
+	template <typename FieldType, typename TypeAlias>
+	FieldType* GetField(const FM2RecordHandle& Handle)
+	{
+		TObjectPtr<UM2RecordSet>* Result = SetsById.Find(Handle.SetId);
+		return Result ? Result->Get()->GetField<FieldType, TypeAlias>(Handle) : nullptr;
 	}
 	
 	/**

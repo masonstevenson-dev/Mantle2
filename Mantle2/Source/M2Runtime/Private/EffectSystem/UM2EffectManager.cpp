@@ -30,8 +30,8 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "EffectSystem/M2Effect.h"
+#include "EffectSystem/M2EffectInstance.h"
 #include "EffectSystem/M2EffectManager.h"
-#include "EffectSystem/M2EffectTracker.h"
 #include "Logging/M2LoggingDefs.h"
 #include "Logging/M2LoggingMacros.h"
 
@@ -62,15 +62,15 @@ void UM2EffectManager::PerformOperation(FM2OperationContext& Ctx)
 		return;
 	}
 
-	auto* EffectTracker = Ctx.Registry->GetRecordSet<UM2EffectTracker>();
-	if (!EffectTracker)
+	auto* EffectInstances = Ctx.Registry->GetRecordSet<UM2EffectInstance>();
+	if (!EffectInstances)
 	{
-		M2_LOG(LogM2, Error, TEXT("M2EffectTracker RecordSet is missing."))
+		M2_LOG(LogM2, Error, TEXT("M2EffectInstance RecordSet is missing."))
 		return;
 	}
 
-	TArrayView<FM2RecordHandle> RecordHandles = EffectTracker->GetHandles();
-	TArrayView<FM2EffectMetadata> MetadataArray = EffectTracker->GetFieldArray<FM2EffectMetadata>();
+	TArrayView<FM2RecordHandle> RecordHandles = EffectInstances->GetHandles();
+	TArrayView<FM2EffectMetadata> MetadataArray = EffectInstances->GetFieldArray<FM2EffectMetadata>();
 
 	if (RecordHandles.Num() != MetadataArray.Num())
 	{
@@ -97,6 +97,7 @@ void UM2EffectManager::PerformOperation(FM2OperationContext& Ctx)
 		
 		FM2EffectContext EffectContext;
 		EffectContext.World = Ctx.World.Get();
+		EffectContext.Registry = Ctx.Registry.Get();
 
 		if (EffectMetadata.State == EM2EffectState::Scheduled)
 		{
@@ -107,8 +108,7 @@ void UM2EffectManager::PerformOperation(FM2OperationContext& Ctx)
 			}
 
 			// No need for any pre-tick processing, since this is the first tick.
-			
-			if (TargetEffect->TickEffect(EffectContext, EffectMetadata))
+			if (TargetEffect->TickEffect(EffectContext, EffectMetadata) == EM2EffectTriggerResponse::Continue)
 			{
 				EffectMetadata.PostTick();
 			}
@@ -135,7 +135,7 @@ void UM2EffectManager::PerformOperation(FM2OperationContext& Ctx)
 
 			EffectMetadata.PreTick();
 			
-			if (TargetEffect->TickEffect(EffectContext, EffectMetadata))
+			if (TargetEffect->TickEffect(EffectContext, EffectMetadata) == EM2EffectTriggerResponse::Continue)
 			{
 				EffectMetadata.PostTick();
 			}

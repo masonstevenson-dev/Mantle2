@@ -28,28 +28,23 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#pragma once
+#include "Foundation/M2Types.h"
 
-#include "Components/M2AvatarComponent.h"
+#include "VPTBase.generated.h"
 
-#include "Fields/Avatar.h"
-
-UM2AvatarComponent::UM2AvatarComponent(const FObjectInitializer& Initializer): Super(Initializer)
+USTRUCT()
+struct M2RUNTIME_API FLD_VPTBase
 {
-	bWantsInitializeComponent = true; // needed for UninitializeComponent
-}
+	GENERATED_BODY()
 
-void UM2AvatarComponent::UninitializeComponent()
-{
-	Super::UninitializeComponent();
+public:
+	UPROPERTY()
+	bool bEnabled = false;
 	
-	if (bRemoveRecordOnDestruction)
-	{
-		Registry->RemoveRecord(RecordHandle);
-	}
-	else if (auto* AvatarField = Registry->GetField<FLD_AvatarActor>(RecordHandle))
-	{
-		AvatarField->AvatarActor = nullptr;
-	}
+	UPROPERTY()
+	float DeltaTime = -1.0f;
 
-	RecordHandle = FM2RecordHandle();
-}
+	UPROPERTY()
+	FM2RecordHandle LastHit = FM2RecordHandle();
+};

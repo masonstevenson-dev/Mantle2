@@ -34,6 +34,7 @@
 #include "Components/M2AvatarComponent.h"
 #include "Fields/Avatar.h"
 #include "Foundation/M2Engine.h"
+#include "FunctionLibraries/M2EngineLibrary.h"
 #include "Logging/M2LoggingDefs.h"
 #include "Logging/M2LoggingMacros.h"
 
@@ -74,8 +75,7 @@ bool AM2Actor::InitializeMantleActor()
 		return bIsInitialized;
 	}
 
-	auto* MantleEngine = UGameInstance::GetSubsystem<UM2Engine>(GetGameInstance());
-	Registry = MantleEngine ? MantleEngine->GetRegistry() : nullptr;
+	Registry = UM2EngineLibrary::GetRegistry(GetGameInstance());
 
 	if (!Registry)
 	{
@@ -94,7 +94,7 @@ bool AM2Actor::InitializeMantleActor()
 	{
 		M2_LOG_OBJECT(this, LogM2, Error, TEXT("CreateRecord returned an invalid handle."));
 	}
-	else if (auto* AvatarField = Registry->GetField<FLD_Avatar>(RecordHandle))
+	else if (auto* AvatarField = Registry->GetField<FLD_AvatarActor>(RecordHandle))
 	{
 		AvatarField->AvatarActor = this;
 		AvatarField->AvatarClass = GetClass();

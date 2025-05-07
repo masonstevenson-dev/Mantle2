@@ -33,17 +33,25 @@
 
 #include "Avatar.generated.h"
 
-class AM2Actor;
-
 USTRUCT()
-struct FLD_Avatar
+struct M2RUNTIME_API FLD_AvatarActor
 {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY()
-	TWeakObjectPtr<AM2Actor> AvatarActor = nullptr;
+	TWeakObjectPtr<AActor> AvatarActor = nullptr;
 
 	UPROPERTY()
-	TSubclassOf<AM2Actor> AvatarClass = nullptr; 
+	TSubclassOf<AActor> AvatarClass = nullptr; 
+};
+
+USTRUCT()
+struct M2RUNTIME_API FLD_AvatarObject
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	TWeakObjectPtr<UObject> AvatarObject = nullptr;
 };
