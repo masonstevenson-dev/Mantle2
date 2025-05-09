@@ -34,18 +34,15 @@
 
 #include "M2Effect.generated.h"
 
-UCLASS(Blueprintable)
+UCLASS(Blueprintable, HideDropdown)
 class M2RUNTIME_API UM2Effect : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	// Called the first time an effect is triggered.
-	virtual EM2EffectTriggerResponse TriggerEffect(const FM2EffectContext& Ctx, const FM2EffectMetadata& Metadata) { return TickEffect(Ctx, Metadata); }
-
-	// Called on every subsequent trigger of an effect.
 	virtual EM2EffectTriggerResponse TickEffect(const FM2EffectContext& Ctx, const FM2EffectMetadata& Metadata) { return EM2EffectTriggerResponse::Continue; }
-	
+
+	virtual void OnFinishEffect(const FM2EffectContext& Ctx, const FM2EffectMetadata& Metadata) { }
 	virtual void OnCancelEffect(const FM2EffectContext& Ctx, const FM2EffectMetadata& Metadata) { }
 	virtual void OnDeleteEffect(const FM2EffectContext& Ctx, const FM2EffectMetadata& Metadata) { }
 };

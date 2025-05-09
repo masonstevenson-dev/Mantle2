@@ -154,6 +154,7 @@ void UM2Engine::FinishConfiguration()
 	for (TObjectPtr<UM2Operation> Operation : Operations)
 	{
 		Operation->Initialize(Registry);
+		M2_LOG(LogM2, Log, TEXT("Operation %s initialized."), *Operation->GetClass()->GetName());
 	}
 	
 	EngineState = EM2EngineState::Stopped;	

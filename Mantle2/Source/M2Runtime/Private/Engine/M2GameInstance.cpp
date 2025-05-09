@@ -41,14 +41,21 @@ void UM2GameInstance::Init()
 {
 	Super::Init(); // The UM2Engine subsystem will be initialized here.
 
-	auto* M2Engine = GetSubsystem<UM2Engine>(this);
-	check(M2Engine);
+	if (!bIsInitialized)
+	{
+		auto* M2Engine = GetSubsystem<UM2Engine>(this);
+		check(M2Engine);
 	
-	ConfigureM2Engine(*M2Engine);
-	M2Engine->FinishConfiguration();
-	FWorldDelegates::OnWorldBeginTearDown.AddUObject(this, &ThisClass::OnWorldTearDown);
+		ConfigureM2Engine(*M2Engine);
+		M2Engine->FinishConfiguration();
+		FWorldDelegates::OnWorldBeginTearDown.AddUObject(this, &ThisClass::OnWorldTearDown);
 	
-	bIsInitialized = true;
+		bIsInitialized = true;
+	}
+	else
+	{
+		M2_LOG_OBJECT(this, LogM2, Warning, TEXT("M2Engine has already been initialized."));
+	}
 
 	if (CurrentWorld.IsValid())
 	{
@@ -70,6 +77,9 @@ void UM2GameInstance::Shutdown()
 
 void UM2GameInstance::OnWorldChanged(UWorld* OldWorld, UWorld* NewWorld)
 {
+	// This is stubbed out on the parent.
+	// Super::OnWorldChanged(OldWorld, NewWorld);
+	
 	if (CurrentWorld == NewWorld)
 	{
 		return;

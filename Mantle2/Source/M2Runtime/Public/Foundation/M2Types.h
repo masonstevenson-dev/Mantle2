@@ -80,6 +80,7 @@ enum class EM2EffectState: uint8
 	Scheduled,
 	Tick,
 	Cancel,
+	Finished,
 	Delete
 };
 
@@ -251,7 +252,7 @@ protected:
 		}
 		else
 		{
-			State = EM2EffectState::Delete;
+			State = EM2EffectState::Finished;
 		}
 	}
 	

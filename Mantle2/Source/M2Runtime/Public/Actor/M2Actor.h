@@ -57,7 +57,7 @@ public:
 	UM2AvatarComponent* AvatarComponent = nullptr;
 	
 protected:
-	virtual FM2RecordHandle CreateRecord(UM2Registry& InRegistry) { return FM2RecordHandle(); }
+	virtual FM2RecordHandle CreateRecord(UM2Registry& InRegistry);
 
 	UPROPERTY()
 	TObjectPtr<UM2Registry> Registry = nullptr;
@@ -66,6 +66,7 @@ protected:
 	bool bIsRegisteredWithMantle = false;
 	bool bRemoveEntityOnDestruction = false;
 
-	// If true, this actor will not be registered with mantle until you explicitly call InitializeMantleActor();
+	// Sometimes you may wish to manually set some data on this actor before you register it with mantle. In that case,
+	// you can set this to true and then manually call InitializeMantleActor().
 	bool bDeferInitialization = false;
 };

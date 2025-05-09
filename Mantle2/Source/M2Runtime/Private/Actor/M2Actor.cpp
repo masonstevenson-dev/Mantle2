@@ -48,9 +48,12 @@ void AM2Actor::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
 
-	if (!InitializeMantleActor())
+	if (!bIsInitialized && !bDeferInitialization)
 	{
-		M2_LOG_OBJECT(this, LogM2, Warning, TEXT("Failed to initialize mantle actor during PreInitializeComponents. Will try again on BeginPlay."));
+		if (!InitializeMantleActor())
+		{
+			M2_LOG_OBJECT(this, LogM2, Warning, TEXT("Failed to initialize mantle actor during PreInitializeComponents. Will try again on BeginPlay."));
+		}
 	}
 }
 
@@ -58,7 +61,7 @@ void AM2Actor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!bIsInitialized)
+	if (!bIsInitialized && !bDeferInitialization)
 	{
 		if (!InitializeMantleActor())
 		{
@@ -92,7 +95,8 @@ bool AM2Actor::InitializeMantleActor()
 	FM2RecordHandle RecordHandle = CreateRecord(*Registry);
 	if (!RecordHandle.IsValid(Registry))
 	{
-		M2_LOG_OBJECT(this, LogM2, Error, TEXT("CreateRecord returned an invalid handle."));
+		M2_LOG_OBJECT(this, LogM2, Error, TEXT("CreateRecord returned an invalid handle. Skipping initialization"));
+		return bIsInitialized;
 	}
 	else if (auto* AvatarField = Registry->GetField<FLD_AvatarActor>(RecordHandle))
 	{
@@ -114,4 +118,10 @@ bool AM2Actor::InitializeMantleActor()
 			
 	bIsInitialized = true;
 	return bIsInitialized;
+}
+
+FM2RecordHandle AM2Actor::CreateRecord(UM2Registry& InRegistry)
+{
+	M2_LOG_OBJECT(this, LogM2, Error, TEXT("CreateRecord must be overriden by all classes derived from AM2Actor."));
+	return FM2RecordHandle();
 }

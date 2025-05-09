@@ -45,6 +45,19 @@ void UM2EffectManager::Initialize(UM2Registry* Registry)
 		{
 			continue;
 		}
+		if (TargetClass->HasAnyFlags(RF_Transient) || TargetClass->HasAnyClassFlags(CLASS_Abstract))
+		{
+			continue;
+		}
+		if (TargetClass->GetName().StartsWith(TEXT("SKEL_")) || TargetClass->GetName().StartsWith(TEXT("REINST_")))
+		{
+			// Note: The warning is here because the RF_Transient check should theoretically catch these. If for
+			//       some reason it doesn't, this check is fairly brittle, so there should be a notification.
+			M2_LOG(LogM2, Warning, TEXT("Target class is an engine temporary class: %s."), *TargetClass->GetName());
+			continue;
+		}
+
+		M2_LOG(LogM2, Log, TEXT("Registering effect type %s."), *TargetClass->GetName());
 
 		// Constructs a shared object for this effect type.
 		if (!Registry->GetShared<UM2Effect>(TargetClass))
@@ -87,7 +100,7 @@ void UM2EffectManager::PerformOperation(FM2OperationContext& Ctx)
 
 		UM2Effect* TargetEffect = Ctx.Registry->GetShared<UM2Effect>(EffectMetadata.Effect);
 
-		if (TargetEffect)
+		if (!TargetEffect)
 		{
 			// TODO(): increment stat counter.
 			EffectMetadata.State = EM2EffectState::Delete;
@@ -103,14 +116,20 @@ void UM2EffectManager::PerformOperation(FM2OperationContext& Ctx)
 		{
 			if (!EffectMetadata.HasRemainingTriggers() || !EffectMetadata.HasRemainingDuration())
 			{
-				EffectMetadata.State = EM2EffectState::Delete;
+				EffectMetadata.State = EM2EffectState::Finished;
 				continue;
 			}
 
 			// No need for any pre-tick processing, since this is the first tick.
-			if (TargetEffect->TickEffect(EffectContext, EffectMetadata) == EM2EffectTriggerResponse::Continue)
+			EM2EffectTriggerResponse Response = TargetEffect->TickEffect(EffectContext, EffectMetadata);
+			if (Response == EM2EffectTriggerResponse::Continue)
 			{
 				EffectMetadata.PostTick();
+			}
+			else if (Response == EM2EffectTriggerResponse::Done)
+			{
+				TargetEffect->OnFinishEffect(EffectContext, EffectMetadata);
+				EffectMetadata.State = EM2EffectState::Finished;
 			}
 			else
 			{
@@ -125,7 +144,7 @@ void UM2EffectManager::PerformOperation(FM2OperationContext& Ctx)
 			
 			if (!EffectMetadata.HasRemainingTriggers() || !EffectMetadata.HasRemainingDuration())
 			{
-				EffectMetadata.State = EM2EffectState::Delete;
+				EffectMetadata.State = EM2EffectState::Finished;
 				continue;
 			}
 			if (!EffectMetadata.IsReadyForTick())
@@ -135,9 +154,14 @@ void UM2EffectManager::PerformOperation(FM2OperationContext& Ctx)
 
 			EffectMetadata.PreTick();
 			
-			if (TargetEffect->TickEffect(EffectContext, EffectMetadata) == EM2EffectTriggerResponse::Continue)
+			EM2EffectTriggerResponse Response = TargetEffect->TickEffect(EffectContext, EffectMetadata);
+			if (Response == EM2EffectTriggerResponse::Continue)
 			{
 				EffectMetadata.PostTick();
+			}
+			else if (Response == EM2EffectTriggerResponse::Done)
+			{
+				EffectMetadata.State = EM2EffectState::Finished;
 			}
 			else
 			{
@@ -147,6 +171,11 @@ void UM2EffectManager::PerformOperation(FM2OperationContext& Ctx)
 		else if (EffectMetadata.State == EM2EffectState::Cancel)
 		{
 			TargetEffect->OnCancelEffect(EffectContext, EffectMetadata);
+			EffectMetadata.State = EM2EffectState::Delete;
+		}
+		else if (EffectMetadata.State == EM2EffectState::Finished)
+		{
+			TargetEffect->OnFinishEffect(EffectContext, EffectMetadata);
 			EffectMetadata.State = EM2EffectState::Delete;
 		}
 		else if (EffectMetadata.State == EM2EffectState::Delete)
