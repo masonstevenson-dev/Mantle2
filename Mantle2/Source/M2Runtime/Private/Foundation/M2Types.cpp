@@ -35,5 +35,10 @@
 
 bool FM2RecordHandle::IsValid(UM2Registry* Registry) const
 {
+	if (!IsSet())
+	{
+		return false;
+	}
+	
 	return Registry ? Registry->HasRecord(*this) : false;
 }

@@ -60,6 +60,10 @@ public:
 		RecordId = FGuid();
 	}
 
+	// Returns true if this handle is non-null. This does not mean the handle points to a valid record.
+	bool IsSet() const { return SetId.IsValid() && RecordId.IsValid(); }
+
+	// Returns true if this handle is non-null and points to a valid record.
 	bool IsValid(UM2Registry* Registry) const;
 
 private:
@@ -194,12 +198,12 @@ public:
 		return *this;
 	}
 
-	bool HasRemainingTriggers()
+	bool HasRemainingTriggers() const
 	{
 		return TriggerLimit == FM2EffectMetadata::kUnlimitedTriggers || TriggerCount < TriggerLimit;
 	}
 
-	bool HasRemainingDuration()
+	bool HasRemainingDuration() const
 	{
 		return MaxDuration == FM2EffectMetadata::kUnlimitedDuration || TotalElapsedTime <= MaxDuration;
 	}
@@ -209,7 +213,7 @@ public:
 		State = EM2EffectState::Cancel;
 	}
 
-	bool HasEverTicked()
+	bool HasEverTicked() const
 	{
 		return TriggerCount > 0;
 	}
