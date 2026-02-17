@@ -536,7 +536,7 @@ public:
 		// TODO(): Add tests for aliased fields.
 	}
 	
-	virtual uint32 GetTestFlags() const override
+	virtual EAutomationTestFlags GetTestFlags() const override
 	{
 		return EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter;
 	}
