@@ -100,21 +100,6 @@ public:
 		TObjectPtr<UM2RecordSet>* Result = SetsById.Find(Handle.SetId);
 		return Result ? Result->Get()->GetField<FieldType>(Handle) : nullptr;
 	}
-
-	/**
-	 * Fetches an aliased field for an individual record.
-	 * 
-	 * @tparam FieldType - The type of field to fetch.
-	 * @tparam TypeAlias - The alias for the field to fetch.
-	 * @param Handle - The RecordHandle, which is a unique id for a target record.
-	 * @return Returns a pointer to the matching field if it exists, otherwise nullptr.
-	 */
-	template <typename FieldType, typename TypeAlias>
-	FieldType* GetField(const FM2RecordHandle& Handle)
-	{
-		TObjectPtr<UM2RecordSet>* Result = SetsById.Find(Handle.SetId);
-		return Result ? Result->Get()->GetField<FieldType, TypeAlias>(Handle) : nullptr;
-	}
 	
 	/**
 	 *	Fetches a RecordSet of the target type, if one exists.

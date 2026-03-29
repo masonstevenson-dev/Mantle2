@@ -532,8 +532,6 @@ public:
 		REGISTER_TEST_SUITE_FN(Test_ProcessArchetype);
 		REGISTER_TEST_SUITE_FN(Test_ProcessArchetypeWithTags);
 		REGISTER_TEST_SUITE_FN(Test_GetShared);
-
-		// TODO(): Add tests for aliased fields.
 	}
 	
 	virtual EAutomationTestFlags GetTestFlags() const override

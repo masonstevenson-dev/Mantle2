@@ -37,23 +37,18 @@
 
 class TestSuite;
 
-#define I_M2_INITIALIZE_FIELD(TypeOrAlias, FieldName)																					\
+#define I_M2_INITIALIZE_FIELD(FieldType, FieldName)																					\
 	AddRecordFns.Add([this]() { return FieldName.AddDefaulted(); });																	\
 	RemoveRecordFns.Add([this](int32 RecordIndex) { FieldName.RemoveAtSwap(RecordIndex); });											\
-	GetFieldFns.Add(TypeOrAlias::StaticStruct(), [this](){ return FAnankeUntypedArrayView(FieldName.GetData(), FieldName.Num()); });	\
-	Archetype.Add(TypeOrAlias::StaticStruct());
+	GetFieldFns.Add(FieldType::StaticStruct(), [this](){ return FAnankeUntypedArrayView(FieldName.GetData(), FieldName.Num()); });	\
+	Archetype.Add(FieldType::StaticStruct());
 
 // Note: We include Check##FieldType as a simple way of forcing a compilation error if:
 //			1) The field "FieldName" was declared with a different type other than FieldType.
-//			2) Any other field was initialized with the same field type. If you want to initialize multiple fields with
-//			   the same type, use M2_INITIALIZE_FIELD_WITH_ALIAS instead.
+//			2) Any other field was initialized with the same field type.
 #define M2_INITIALIZE_FIELD(FieldType, FieldName)		\
 	FieldType* Check##FieldType = FieldName.GetData();	\
 	I_M2_INITIALIZE_FIELD(FieldType, FieldName)
-
-#define M2_INITIALIZE_FIELD_WITH_ALIAS(FieldType, TypeAlias, FieldName)	\
-	FieldType* Check##FieldType##TypeAlias = FieldName.GetData();		\
-	I_M2_INITIALIZE_FIELD(TypeAlias, FieldName)
 
 #define M2_INITIALIZE_TAG(TagType) \
 	Archetype.Add(TagType::StaticStruct());
@@ -97,35 +92,11 @@ public:
 		return &FieldArray[RecordIndexMap.FindChecked(Handle.RecordId)];
 	}
 
-	template <typename ViewType, typename TypeAlias>
-	ViewType* GetField(const FM2RecordHandle& Handle)
-	{
-		if (!HasRecord(Handle))
-		{
-			return nullptr;
-		}
-
-		TArrayView<ViewType> FieldArray = GetFieldArray<ViewType, TypeAlias>();
-		if (!FieldArray.GetData())
-		{
-			return nullptr;
-		}
-		
-		return &FieldArray[RecordIndexMap.FindChecked(Handle.RecordId)];
-	}
-
 	template <typename ViewType>
 	ViewType* GetSingletonField()
 	{
 		RefreshSingleton();
 		return GetField<ViewType>(SingletonHandle);
-	}
-
-	template <typename ViewType, typename TypeAlias>
-	ViewType* GetSingletonField()
-	{
-		RefreshSingleton();
-		return GetField<ViewType, TypeAlias>(SingletonHandle);
 	}
 
 	FM2RecordHandle GetSingletonHandle()
@@ -138,12 +109,6 @@ public:
 	TArrayView<ViewType> GetFieldArray()
 	{
 		return GetFieldInternal(ViewType::StaticStruct()).template GetArrayView<ViewType>();
-	}
-
-	template <typename ViewType, typename TypeAlias>
-	TArrayView<ViewType> GetFieldArray()
-	{
-		return GetFieldInternal(TypeAlias::StaticStruct()).template GetArrayView<ViewType>();
 	}
 	
 	bool MatchArchetype(TArray<UScriptStruct*>& Match, TArray<UScriptStruct*>& Exclude);
@@ -191,6 +156,8 @@ protected:
 	UPROPERTY()
 	TMap<FGuid, int32> RecordIndexMap;
 	
+	// Note, these fields are NOT marked as UPROPERTY. The intention is to rebuild them whenever this data object
+	// is deserialized from disk instead of trying to make sure all these pointers are always valid.
 	TArray<TFunction<void()>> AddRecordFns;
 	TArray<TFunction<void(int32)>> RemoveRecordFns;
 	TMap<UScriptStruct*, TFunction<FAnankeUntypedArrayView()>> GetFieldFns;
@@ -202,6 +169,8 @@ protected:
 	UPROPERTY()
 	FM2RecordHandle SingletonHandle;
 
+	// If true, creates a singleton RecordHandle under the hood for you. Note that even if you don't set this
+	// to true, calling GetSingletonField will create the handle if it does not exist.
 	UPROPERTY()
 	bool bInitWithSingleton = false;
 };
