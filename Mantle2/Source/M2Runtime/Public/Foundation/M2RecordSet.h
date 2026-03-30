@@ -37,18 +37,15 @@
 
 class TestSuite;
 
-#define I_M2_INITIALIZE_FIELD(FieldType, FieldName)																					\
-	AddRecordFns.Add([this]() { return FieldName.AddDefaulted(); });																	\
-	RemoveRecordFns.Add([this](int32 RecordIndex) { FieldName.RemoveAtSwap(RecordIndex); });											\
-	GetFieldFns.Add(FieldType::StaticStruct(), [this](){ return FAnankeUntypedArrayView(FieldName.GetData(), FieldName.Num()); });	\
-	Archetype.Add(FieldType::StaticStruct());
-
 // Note: We include Check##FieldType as a simple way of forcing a compilation error if:
 //			1) The field "FieldName" was declared with a different type other than FieldType.
 //			2) Any other field was initialized with the same field type.
-#define M2_INITIALIZE_FIELD(FieldType, FieldName)		\
-	FieldType* Check##FieldType = FieldName.GetData();	\
-	I_M2_INITIALIZE_FIELD(FieldType, FieldName)
+#define M2_INITIALIZE_FIELD(FieldType, FieldName)																						\
+	FieldType* Check##FieldType = FieldName.GetData();																					\
+	AddRecordFns.Add([this]() { return FieldName.AddDefaulted(); });																	\
+	RemoveRecordFns.Add([this](int32 RecordIndex) { FieldName.RemoveAtSwap(RecordIndex); });											\
+	GetFieldFns.Add(FieldType::StaticStruct(), [this](){ return FAnankeUntypedArrayView(FieldName.GetData(), FieldName.Num()); });		\
+	Archetype.Add(FieldType::StaticStruct());
 
 #define M2_INITIALIZE_TAG(TagType) \
 	Archetype.Add(TagType::StaticStruct());

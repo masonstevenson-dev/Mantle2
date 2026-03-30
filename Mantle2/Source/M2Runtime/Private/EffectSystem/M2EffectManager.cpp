@@ -69,12 +69,6 @@ void UM2EffectManager::Initialize(UM2Registry* Registry)
 
 void UM2EffectManager::PerformOperation(FM2OperationContext& Ctx)
 {
-	if (!Ctx.Registry.IsValid())
-	{
-		M2_LOG(LogM2, Error, TEXT("Registry is missing."))
-		return;
-	}
-
 	auto* EffectInstances = Ctx.Registry->GetRecordSet<UM2EffectInstance>();
 	if (!EffectInstances)
 	{

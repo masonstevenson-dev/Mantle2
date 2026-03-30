@@ -55,6 +55,17 @@ void FM2EngineLoop::ExecuteTick(
 	}
 
 	OperationContext.DeltaTime = DeltaTime;
+	
+	if (!OperationContext.World.IsValid())
+	{
+		M2_LOG(LogM2, Error, TEXT("Unable to tick operation groups: Invalid World"));
+		return;
+	}
+	if (!OperationContext.Registry.IsValid())
+	{
+		M2_LOG(LogM2, Error, TEXT("Unable to tick operation groups: Invalid Registry"));
+		return;
+	}
 
 	for (FM2OperationGroup& OperationGroup : Options.OperationGroups)
 	{
