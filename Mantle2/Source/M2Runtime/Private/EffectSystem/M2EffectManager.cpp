@@ -29,9 +29,9 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "EffectSystem/M2EffectManager.h"
 #include "EffectSystem/M2Effect.h"
 #include "EffectSystem/M2EffectInstance.h"
-#include "EffectSystem/M2EffectManager.h"
 #include "Logging/M2LoggingDefs.h"
 #include "Logging/M2LoggingMacros.h"
 

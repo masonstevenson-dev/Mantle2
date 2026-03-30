@@ -188,6 +188,7 @@ public:
 		return *this;
 	}
 
+	// A generic way of associating some record with this effect.
 	FM2EffectMetadata& WithInstanceData(const FM2RecordHandle& RecordHandle)
 	{
 		if (State == EM2EffectState::Scheduled)
