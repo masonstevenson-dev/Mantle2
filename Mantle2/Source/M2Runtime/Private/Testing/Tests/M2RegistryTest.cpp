@@ -94,9 +94,10 @@ public:
 	{
 		Registry->ConstructRecordSets();
 
-		TestRH_1 = Registry->AddRecord<UM2TestSet_Door>();
-		TestRH_2 = Registry->AddRecord<UM2TestSet_Door>();
-		TestRH_3 = Registry->AddRecord<UM2TestSet_Door>();
+		RH_Door_1 = Registry->AddRecord<UM2TestSet_Door>();
+		RH_Door_2 = Registry->AddRecord<UM2TestSet_Door>();
+		RH_Door_3 = Registry->AddRecord<UM2TestSet_Door>();
+		RH_Door_4 = Registry->AddRecord<UM2TestSet_Door>();
 		TestRH_Invalid = FM2RecordHandle();
 
 		UM2TestSet_Door* DoorSet = Registry->GetRecordSet<UM2TestSet_Door>();
@@ -104,14 +105,16 @@ public:
 		DoorSet->Door[0].bIsOpen = false;
 		DoorSet->Door[1].bIsOpen = true;
 		DoorSet->Door[2].bIsOpen = false;
+		DoorSet->Door[3].bIsOpen = false;
 
 		DoorSet->Avatar[0].WorldPosition = FVector(1.0, 1.0, 1.0);
 		DoorSet->Avatar[1].WorldPosition = FVector(2.0, 2.0, 2.0);
 		DoorSet->Avatar[2].WorldPosition = FVector(3.0, 3.0, 3.0);
+		DoorSet->Avatar[3].WorldPosition = FVector(4.0, 4.0, 4.0);
 
-		TestRH_4 = Registry->AddRecord<UM2TestSet_Wall>();
-		TestRH_5 = Registry->AddRecord<UM2TestSet_Wall>();
-		TestRH_6 = Registry->AddRecord<UM2TestSet_Wall>();
+		RH_Wall_1 = Registry->AddRecord<UM2TestSet_Wall>();
+		RH_Wall_2 = Registry->AddRecord<UM2TestSet_Wall>();
+		RH_Wall_3 = Registry->AddRecord<UM2TestSet_Wall>();
 
 		UM2TestSet_Wall* WallSet = Registry->GetRecordSet<UM2TestSet_Wall>();
 		WallSet->Avatar[0].WorldPosition = FVector(4.0, 4.0, 4.0);
@@ -186,9 +189,9 @@ public:
 		UM2TestSet_Door* DoorSet = Registry->GetRecordSet<UM2TestSet_Door>();
 		ANANKE_TEST_NOT_NULL(TestFramework, DoorSet);
 
-		ANANKE_TEST_EQUAL(TestFramework, DoorSet->GetHandles().Num(), 3);
-		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Door.Num(), 3);
-		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Avatar.Num(), 3);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->GetHandles().Num(), 4);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Door.Num(), 4);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Avatar.Num(), 4);
 
 		FM2RecordHandle NewRecordHandle = Registry->AddRecord<UM2TestSet_Door>();
 		Registry->GetField<FM2TestField_Door>(NewRecordHandle)->bIsOpen = true;
@@ -203,16 +206,16 @@ public:
 		ANANKE_TEST_TRUE(TestFramework, NewRecordHandle.SetId == DoorSet->SetId);
 		ANANKE_TEST_TRUE(TestFramework, DoorSet->RecordIndexMap.Contains(NewRecordHandle.RecordId));
 		ANANKE_TEST_TRUE(TestFramework, Registry->HasRecord(NewRecordHandle));
-		ANANKE_TEST_EQUAL(TestFramework, DoorSet->GetHandles().Num(), 4);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->GetHandles().Num(), 5);
 		
 		TArrayView<FM2TestField_Door> DoorFields = DoorSet->GetFieldArray<FM2TestField_Door>();
 		TArrayView<FM2TestField_Avatar> AvatarFields = DoorSet->GetFieldArray<FM2TestField_Avatar>();
 		
-		if (!ANANKE_TEST_EQUAL(TestFramework, DoorFields.Num(), 4))
+		if (!ANANKE_TEST_EQUAL(TestFramework, DoorFields.Num(), 5))
 		{
 			return;
 		}
-		if (!ANANKE_TEST_EQUAL(TestFramework, AvatarFields.Num(), 4))
+		if (!ANANKE_TEST_EQUAL(TestFramework, AvatarFields.Num(), 5))
 		{
 			return;
 		}
@@ -220,12 +223,14 @@ public:
 		ANANKE_TEST_TRUE(TestFramework, DoorFields[0].bIsOpen == false);
 		ANANKE_TEST_TRUE(TestFramework, DoorFields[1].bIsOpen == true);
 		ANANKE_TEST_TRUE(TestFramework, DoorFields[2].bIsOpen == false);
-		ANANKE_TEST_TRUE(TestFramework, DoorFields[3].bIsOpen == true);
+		ANANKE_TEST_TRUE(TestFramework, DoorFields[3].bIsOpen == false);
+		ANANKE_TEST_TRUE(TestFramework, DoorFields[4].bIsOpen == true);
 
 		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[0].WorldPosition, FVector(1.0, 1.0, 1.0));
 		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[1].WorldPosition, FVector(2.0, 2.0, 2.0));
 		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[2].WorldPosition, FVector(3.0, 3.0, 3.0));
-		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[3].WorldPosition, FVector(42.0, 42.0, 42.0));
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[3].WorldPosition, FVector(4.0, 4.0, 4.0));
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[4].WorldPosition, FVector(42.0, 42.0, 42.0));
 	}
 
 	void Test_RemoveRecord()
@@ -235,29 +240,31 @@ public:
 		UM2TestSet_Door* DoorSet = Registry->GetRecordSet<UM2TestSet_Door>();
 		ANANKE_TEST_NOT_NULL(TestFramework, DoorSet);
 
-		ANANKE_TEST_EQUAL(TestFramework, DoorSet->GetHandles().Num(), 3);
-		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Door.Num(), 3);
-		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Avatar.Num(), 3);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->GetHandles().Num(), 4);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Door.Num(), 4);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Avatar.Num(), 4);
 
 		Registry->RemoveRecord(DoorSet->GetHandles()[1]);
 
 		TArrayView<FM2TestField_Door> DoorFields = DoorSet->GetFieldArray<FM2TestField_Door>();
 		TArrayView<FM2TestField_Avatar> AvatarFields = DoorSet->GetFieldArray<FM2TestField_Avatar>();
 		
-		if (!ANANKE_TEST_EQUAL(TestFramework, DoorFields.Num(), 2))
+		if (!ANANKE_TEST_EQUAL(TestFramework, DoorFields.Num(), 3))
 		{
 			return;
 		}
-		if (!ANANKE_TEST_EQUAL(TestFramework, AvatarFields.Num(), 2))
+		if (!ANANKE_TEST_EQUAL(TestFramework, AvatarFields.Num(), 3))
 		{
 			return;
 		}
 
 		ANANKE_TEST_TRUE(TestFramework, DoorFields[0].bIsOpen == false);
 		ANANKE_TEST_TRUE(TestFramework, DoorFields[1].bIsOpen == false);
+		ANANKE_TEST_TRUE(TestFramework, DoorFields[2].bIsOpen == false);
 
 		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[0].WorldPosition, FVector(1.0, 1.0, 1.0));
-		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[1].WorldPosition, FVector(3.0, 3.0, 3.0));
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[1].WorldPosition, FVector(4.0, 4.0, 4.0)); // Remove does a "RemoveAtSwap"
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[2].WorldPosition, FVector(3.0, 3.0, 3.0));
 
 		FM2RecordHandle NewRecordHandle = Registry->AddRecord<UM2TestSet_Door>();
 		Registry->GetField<FM2TestField_Door>(NewRecordHandle)->bIsOpen = true;
@@ -266,22 +273,35 @@ public:
 		DoorFields = DoorSet->GetFieldArray<FM2TestField_Door>();
 		AvatarFields = DoorSet->GetFieldArray<FM2TestField_Avatar>();
 		
-		if (!ANANKE_TEST_TRUE(TestFramework, DoorFields.Num() == 3))
+		if (!ANANKE_TEST_TRUE(TestFramework, DoorFields.Num() == 4))
 		{
 			return;
 		}
-		if (!ANANKE_TEST_TRUE(TestFramework, AvatarFields.Num() == 3))
+		if (!ANANKE_TEST_TRUE(TestFramework, AvatarFields.Num() == 4))
 		{
 			return;
 		}
 
 		ANANKE_TEST_EQUAL(TestFramework, DoorFields[0].bIsOpen, false);
 		ANANKE_TEST_EQUAL(TestFramework, DoorFields[1].bIsOpen, false);
-		ANANKE_TEST_EQUAL(TestFramework, DoorFields[2].bIsOpen, true);
+		ANANKE_TEST_EQUAL(TestFramework, DoorFields[2].bIsOpen, false);
+		ANANKE_TEST_EQUAL(TestFramework, DoorFields[3].bIsOpen, true);
 
 		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[0].WorldPosition, FVector(1.0, 1.0, 1.0));
-		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[1].WorldPosition, FVector(3.0, 3.0, 3.0));
-		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[2].WorldPosition, FVector(42.0, 42.0, 42.0));
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[1].WorldPosition, FVector(4.0, 4.0, 4.0));
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[2].WorldPosition, FVector(3.0, 3.0, 3.0));
+		ANANKE_TEST_EQUAL(TestFramework, AvatarFields[3].WorldPosition, FVector(42.0, 42.0, 42.0));
+		
+		// Make sure the ID mapping still works
+		ANANKE_TEST_EQUAL(TestFramework, Registry->GetField<FM2TestField_Door>(RH_Door_1)->bIsOpen, false);
+		ANANKE_TEST_EQUAL(TestFramework, Registry->GetField<FM2TestField_Door>(RH_Door_3)->bIsOpen, false);
+		ANANKE_TEST_EQUAL(TestFramework, Registry->GetField<FM2TestField_Door>(RH_Door_4)->bIsOpen, false);
+		ANANKE_TEST_EQUAL(TestFramework, Registry->GetField<FM2TestField_Door>(NewRecordHandle)->bIsOpen, true);
+		
+		ANANKE_TEST_EQUAL(TestFramework, Registry->GetField<FM2TestField_Avatar>(RH_Door_1)->WorldPosition, FVector(1.0, 1.0, 1.0));
+		ANANKE_TEST_EQUAL(TestFramework, Registry->GetField<FM2TestField_Avatar>(RH_Door_3)->WorldPosition, FVector(3.0, 3.0, 3.0));
+		ANANKE_TEST_EQUAL(TestFramework, Registry->GetField<FM2TestField_Avatar>(RH_Door_4)->WorldPosition, FVector(4.0, 4.0, 4.0));
+		ANANKE_TEST_EQUAL(TestFramework, Registry->GetField<FM2TestField_Avatar>(NewRecordHandle)->WorldPosition, FVector(42.0, 42.0, 42.0));
 
 		for (FM2RecordHandle RecordHandle : DoorSet->GetHandles())
 		{
@@ -299,9 +319,9 @@ public:
 	{
 		InitRegistry();
 
-		FM2TestField_Avatar* Field1 = Registry->GetField<FM2TestField_Avatar>(TestRH_1);
-		FM2TestField_Avatar* Field2 = Registry->GetField<FM2TestField_Avatar>(TestRH_2);
-		FM2TestField_Avatar* Field3 = Registry->GetField<FM2TestField_Avatar>(TestRH_3);
+		FM2TestField_Avatar* Field1 = Registry->GetField<FM2TestField_Avatar>(RH_Door_1);
+		FM2TestField_Avatar* Field2 = Registry->GetField<FM2TestField_Avatar>(RH_Door_2);
+		FM2TestField_Avatar* Field3 = Registry->GetField<FM2TestField_Avatar>(RH_Door_3);
 		FM2TestField_Avatar* InvalidField = Registry->GetField<FM2TestField_Avatar>(TestRH_Invalid);
 
 		ANANKE_TEST_NOT_NULL(TestFramework, Field1);
@@ -316,9 +336,9 @@ public:
 		UM2TestSet_Door* DoorSet = Registry->GetRecordSet<UM2TestSet_Door>();
 		ANANKE_TEST_NOT_NULL(TestFramework, DoorSet);
 
-		ANANKE_TEST_EQUAL(TestFramework, DoorSet->GetHandles().Num(), 3);
-		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Door.Num(), 3);
-		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Avatar.Num(), 3);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->GetHandles().Num(), 4);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Door.Num(), 4);
+		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Avatar.Num(), 4);
 
 		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Avatar[0].WorldPosition, FVector(2.0, 2.0, 2.0));
 		ANANKE_TEST_EQUAL(TestFramework, DoorSet->Avatar[1].WorldPosition, FVector(3.0, 3.0, 3.0));
@@ -414,6 +434,7 @@ public:
 			FVector(1.0, 1.0, 1.0),
 			FVector(2.0, 2.0, 2.0),
 			FVector(3.0, 3.0, 3.0),
+			FVector(4.0, 4.0, 4.0),
 			FVector(42.0, 42.0, 42.0),
 		});
 		int32 ExpectedFieldsProcessed = ExpectedPositions.Num();
@@ -454,6 +475,7 @@ public:
 			FVector(1.0, 1.0, 1.0),
 			FVector(2.0, 2.0, 2.0),
 			FVector(3.0, 3.0, 3.0),
+			FVector(4.0, 4.0, 4.0),
 			FVector(42.0, 42.0, 42.0),
 		});
 		int32 ExpectedFieldsProcessed = ExpectedPositions.Num();
@@ -502,12 +524,13 @@ private:
 	TStrongObjectPtr<UWorld> TestWorld;
 	TStrongObjectPtr<UM2TestRegistry> Registry;
 
-	FM2RecordHandle TestRH_1;
-	FM2RecordHandle TestRH_2;
-	FM2RecordHandle TestRH_3;
-	FM2RecordHandle TestRH_4;
-	FM2RecordHandle TestRH_5;
-	FM2RecordHandle TestRH_6;
+	FM2RecordHandle RH_Door_1;
+	FM2RecordHandle RH_Door_2;
+	FM2RecordHandle RH_Door_3;
+	FM2RecordHandle RH_Door_4;
+	FM2RecordHandle RH_Wall_1;
+	FM2RecordHandle RH_Wall_2;
+	FM2RecordHandle RH_Wall_3;
 	FM2RecordHandle TestRH_Invalid;
 };
 

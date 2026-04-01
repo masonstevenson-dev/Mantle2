@@ -130,6 +130,12 @@ public:
 		return GetFieldFns.Contains(FieldType);
 	}
 
+	/**
+	 * Creates an ID for a new record in this RecordSet. Then for each field struct this RS has defined, pushes a new
+	 * empty value onto the internal array for that field.
+	 * 
+	 * @return Returns a RecordHandle, which is a unique id used to look up the new record.
+	 */
 	FM2RecordHandle AddRecord();
 	void RemoveRecord(FM2RecordHandle& RecordHandle);
 
