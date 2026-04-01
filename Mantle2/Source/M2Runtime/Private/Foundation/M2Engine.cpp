@@ -32,7 +32,6 @@
 #include "Foundation/M2Engine.h"
 
 #include "Foundation/M2Operation.h"
-#include "Macros/AnankeCoreLoggingMacros.h"
 #include "Logging/M2LoggingDefs.h"
 #include "Logging/M2LoggingMacros.h"
 

@@ -77,19 +77,11 @@ public class M2Runtime : ModuleRules
 				"GameplayTags",
 				"InputCore",
 				"StructUtils",
+				
+				// Other Dependencies
+				"AnankeCoreRuntime",
 			}
 		);
-		
-		
-		if (bUseAnankeLog)
-		{
-			PublicDependencyModuleNames.AddRange(
-				new string[]
-				{
-					"AnankeCoreRuntime",
-				}
-			);
-		}
 		
 		PrivateDependencyModuleNames.AddRange(
 			new string[]

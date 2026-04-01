@@ -35,7 +35,6 @@
 #include "Foundation/M2Engine.h"
 #include "Logging/M2LoggingDefs.h"
 #include "Logging/M2LoggingMacros.h"
-#include "Macros/AnankeCoreLoggingMacros.h"
 
 void UM2GameInstance::Init()
 {
