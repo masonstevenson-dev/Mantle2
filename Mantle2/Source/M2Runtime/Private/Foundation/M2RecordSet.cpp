@@ -42,14 +42,6 @@ void UM2RecordSet::Initialize(FGuid NewSetId)
 	Archetype.Empty();
 }
 
-void UM2RecordSet::FinishInitialize()
-{
-	if (bInitWithSingleton)
-	{
-		RefreshSingleton();	
-	}
-}
-
 bool UM2RecordSet::MatchArchetype(TArray<UScriptStruct*>& Match, TArray<UScriptStruct*>& Exclude)
 {
 	for (UScriptStruct* FieldType : Match)
@@ -83,33 +75,6 @@ FM2RecordHandle UM2RecordSet::AddRecord()
 }
 
 void UM2RecordSet::RemoveRecord(FM2RecordHandle& RecordHandle)
-{
-	if (RecordHandle == SingletonHandle)
-	{
-		return;
-	}
-
-	RemoveRecordInternal(RecordHandle);
-}
-
-void UM2RecordSet::ClearSingleton()
-{
-	RemoveRecordInternal(SingletonHandle);
-	SingletonHandle.Clear();
-}
-
-FAnankeUntypedArrayView UM2RecordSet::GetFieldInternal(UScriptStruct* ComponentType)
-{
-	if (!GetFieldFns.Contains(ComponentType))
-	{
-		return FAnankeUntypedArrayView();
-	}
-
-	TFunction<FAnankeUntypedArrayView()> GetFieldFn = GetFieldFns.FindChecked(ComponentType);
-	return GetFieldFn();
-}
-
-void UM2RecordSet::RemoveRecordInternal(FM2RecordHandle& RecordHandle)
 {
 	if (!RecordHandle.SetId.IsValid() || RecordHandle.SetId != SetId)
 	{
@@ -146,10 +111,13 @@ void UM2RecordSet::RemoveRecordInternal(FM2RecordHandle& RecordHandle)
 	}
 }
 
-void UM2RecordSet::RefreshSingleton()
+FAnankeUntypedArrayView UM2RecordSet::GetFieldInternal(UScriptStruct* ComponentType)
 {
-	if (!HasRecord(SingletonHandle))
+	if (!GetFieldFns.Contains(ComponentType))
 	{
-		SingletonHandle = AddRecord();
+		return FAnankeUntypedArrayView();
 	}
+
+	TFunction<FAnankeUntypedArrayView()> GetFieldFn = GetFieldFns.FindChecked(ComponentType);
+	return GetFieldFn();
 }

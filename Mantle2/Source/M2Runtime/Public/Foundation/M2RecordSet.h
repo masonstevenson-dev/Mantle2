@@ -65,7 +65,6 @@ class M2RUNTIME_API UM2RecordSet : public UObject
 
 public:
 	virtual void Initialize(FGuid NewSetId);
-	virtual void FinishInitialize();
 
 	TArrayView<FM2RecordHandle> GetHandles()
 	{
@@ -87,19 +86,6 @@ public:
 		}
 		
 		return &FieldArray[RecordIndexMap.FindChecked(Handle.RecordId)];
-	}
-
-	template <typename ViewType>
-	ViewType* GetSingletonField()
-	{
-		RefreshSingleton();
-		return GetField<ViewType>(SingletonHandle);
-	}
-
-	FM2RecordHandle GetSingletonHandle()
-	{
-		RefreshSingleton();
-		return SingletonHandle;
 	}
 	
 	template <typename ViewType>
@@ -139,16 +125,10 @@ public:
 	FM2RecordHandle AddRecord();
 	void RemoveRecord(FM2RecordHandle& RecordHandle);
 
-	// Note: Calling Get{some field name}() will automatically recreate the singleton.
-	void ClearSingleton();
-
 protected:
 	friend TestSuite;
 	
 	FAnankeUntypedArrayView GetFieldInternal(UScriptStruct* FieldType);
-	void RemoveRecordInternal(FM2RecordHandle& RecordHandle);
-
-	void RefreshSingleton();
 
 	UPROPERTY()
 	FGuid SetId = FGuid();
@@ -165,15 +145,4 @@ protected:
 	TArray<TFunction<void(int32)>> RemoveRecordFns;
 	TMap<UScriptStruct*, TFunction<FAnankeUntypedArrayView()>> GetFieldFns;
 	TSet<UScriptStruct*> Archetype;
-	
-	// Hidden to force authors into using the macro accessor (i.e. GetMyField(), GetMyOtherField(), etc.)
-	// This simplifies refactors: just replace all your M2_DECLARE_SINGLETON_FIELD calls with M2_DECLARE_FIELD and your
-	// code will conveniently break in every place where you called GetMyField(), GetMyOtherField(), etc.
-	UPROPERTY()
-	FM2RecordHandle SingletonHandle;
-
-	// If true, creates a singleton RecordHandle under the hood for you. Note that even if you don't set this
-	// to true, calling GetSingletonField will create the handle if it does not exist.
-	UPROPERTY()
-	bool bInitWithSingleton = false;
 };

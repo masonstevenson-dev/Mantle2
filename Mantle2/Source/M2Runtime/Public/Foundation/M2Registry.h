@@ -66,21 +66,6 @@ public:
 	}
 
 	/**
-	 * Gets a handle for the singleton record associated with a particular record type, or creates one and then returns
-	 * the newly created handle if no singleton currently exists.
-	 * 
-	 * @tparam RecordType - The type of record to add.
-	 * @return - Returns a valid RecordHandle.
-	 */
-	template <typename RecordType>
-	FM2RecordHandle GetSingletonHandle()
-	{
-		static_assert(std::is_base_of_v<UM2RecordSet, RecordType>);
-		TObjectPtr<UM2RecordSet>* Result = SetsByType.Find(RecordType::StaticClass());
-		return Result ? Result->Get()->GetSingletonHandle() : FM2RecordHandle();
-	}
-
-	/**
 	 * Removes a record from the registry, if it exists.
 	 * 
 	 * @param RecordHandle - The handle for the record that should be removed.
