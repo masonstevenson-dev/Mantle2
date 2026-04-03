@@ -98,17 +98,21 @@ bool AM2Actor::InitializeMantleActor()
 		M2_LOG_OBJECT(this, LogM2, Error, TEXT("CreateRecord returned an invalid handle. Skipping initialization"));
 		return bIsInitialized;
 	}
-	else if (auto* AvatarField = Registry->GetField<FLD_AvatarActor>(RecordHandle))
+	
+	if (auto* AvatarField = Registry->GetField<FLD_AvatarActor>(RecordHandle))
 	{
 		AvatarField->AvatarActor = this;
 		AvatarField->AvatarClass = GetClass();
 	}
+	
+	// Not needed?
+	/*
 	else
 	{
 		M2_LOG_OBJECT(this, LogM2, Error, TEXT("Expected record to have Avatar field. Skipping initialization"));
 		Registry->RemoveRecord(RecordHandle);
 		return bIsInitialized;
-	}
+	}*/
 	
 	AvatarComponent = NewObject<UM2AvatarComponent>(this, TEXT("AvatarComponent"));
 	AvatarComponent->RegisterComponent();

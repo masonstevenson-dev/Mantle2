@@ -46,6 +46,8 @@ public:
 	TSubclassOf<AActor> AvatarClass = nullptr; 
 };
 
+// TODO(): Remove?
+/*
 USTRUCT()
 struct M2RUNTIME_API FLD_AvatarObject
 {
@@ -54,4 +56,4 @@ struct M2RUNTIME_API FLD_AvatarObject
 public:
 	UPROPERTY()
 	TWeakObjectPtr<UObject> AvatarObject = nullptr;
-};
+};*/
