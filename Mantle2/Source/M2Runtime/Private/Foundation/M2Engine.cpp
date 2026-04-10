@@ -39,6 +39,7 @@ FM2EngineLoop::FM2EngineLoop()
 {
 	bCanEverTick = true;
 	bStartWithTickEnabled = false;
+	bTickEvenWhenPaused = false;
 }
 
 void FM2EngineLoop::ExecuteTick(
