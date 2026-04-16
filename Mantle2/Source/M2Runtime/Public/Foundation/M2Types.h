@@ -53,6 +53,11 @@ public:
 	{
 		return SetId == Other.SetId && RecordId == Other.RecordId;
 	}
+	
+	friend uint32 GetTypeHash(const FM2RecordHandle& Handle)
+	{
+		return GetTypeHash(Handle.RecordId);
+	}
 
 	void Clear()
 	{
