@@ -48,11 +48,15 @@ void AM2Actor::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
 
-	if (!bIsInitialized && !bDeferInitialization)
+	UWorld* World = GetWorld();
+	if (World && World->IsGameWorld())
 	{
-		if (!InitializeMantleActor())
+		if (!bIsInitialized && !bDeferInitialization)
 		{
-			M2_LOG_OBJECT(this, LogM2, Warning, TEXT("Failed to initialize mantle actor during PreInitializeComponents. Will try again on BeginPlay."));
+			if (!InitializeMantleActor())
+			{
+				M2_LOG_OBJECT(this, LogM2, Warning, TEXT("Failed to initialize mantle actor during PreInitializeComponents. Will try again on BeginPlay."));
+			}
 		}
 	}
 }

@@ -42,14 +42,17 @@ void UM2AvatarComponent::UninitializeComponent()
 {
 	Super::UninitializeComponent();
 	
-	if (bRemoveRecordOnDestruction)
+	if (Registry)
 	{
-		Registry->RemoveRecord(RecordHandle);
-	}
-	else if (auto* AvatarField = Registry->GetField<FLD_AvatarActor>(RecordHandle))
-	{
-		AvatarField->AvatarActor = nullptr;
-	}
+		if (bRemoveRecordOnDestruction)
+		{
+			Registry->RemoveRecord(RecordHandle);
+		}
+		else if (auto* AvatarField = Registry->GetField<FLD_AvatarActor>(RecordHandle))
+		{
+			AvatarField->AvatarActor = nullptr;
+		}
 
-	RecordHandle = FM2RecordHandle();
+		RecordHandle = FM2RecordHandle();
+	}
 }
