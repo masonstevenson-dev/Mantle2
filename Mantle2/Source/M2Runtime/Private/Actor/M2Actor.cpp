@@ -99,7 +99,7 @@ bool AM2Actor::InitializeMantleActor()
 		return bIsInitialized;
 	}
 	
-	if (auto* AvatarField = Registry->GetField<FLD_AvatarActor>(RecordHandle))
+	if (auto* AvatarField = GetAvatarField(*Registry, RecordHandle))
 	{
 		AvatarField->AvatarActor = this;
 		AvatarField->AvatarClass = GetClass();
@@ -128,4 +128,9 @@ FM2RecordHandle AM2Actor::CreateRecord(UM2Registry& InRegistry)
 {
 	M2_LOG_OBJECT(this, LogM2, Error, TEXT("CreateRecord must be overriden by all classes derived from AM2Actor."));
 	return FM2RecordHandle();
+}
+
+FLD_AvatarActor* AM2Actor::GetAvatarField(UM2Registry& InRegistry, FM2RecordHandle& Handle)
+{
+	return InRegistry.GetField<FLD_AvatarActor>(Handle);
 }

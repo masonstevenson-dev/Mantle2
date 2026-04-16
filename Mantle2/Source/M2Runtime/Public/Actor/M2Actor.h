@@ -34,6 +34,7 @@
 
 #include "M2Actor.generated.h"
 
+struct FLD_AvatarActor;
 struct FM2RecordHandle;
 class UM2Registry;
 class UM2AvatarComponent;
@@ -58,6 +59,7 @@ public:
 	
 protected:
 	virtual FM2RecordHandle CreateRecord(UM2Registry& InRegistry);
+	virtual FLD_AvatarActor* GetAvatarField(UM2Registry& InRegistry, FM2RecordHandle& Handle);
 
 	UPROPERTY()
 	TObjectPtr<UM2Registry> Registry = nullptr;
