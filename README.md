@@ -21,7 +21,7 @@ This project is still very much **WIP**. Use at your own risk.
 
 ## Supported Engine Versions
 
-Mantle2 currently supports **UE 5.4.**
+Mantle2 currently supports **UE 5.6.**
 
 <br>
 
