@@ -63,9 +63,8 @@ Some other important concepts:
     *   The central database that holds all ECS data. It manages collections of Record Sets and provides an API to query and modify records.
 
 *   **Record Sets** (`UM2RecordSet`): 
-    *   Each RecordSet is a data container for a particular entity type. Under the hood, all the RecordSet is really doing is storing a bunch of TArray<FYourFieldStruct> for each field you have associated with it. Mantle simply provides a standardized way of accessing this field data.
+    *   Each RecordSet is a data container for a particular entity type. Under the hood, all the RecordSet is really doing is storing a bunch of `TArray<FYourFieldStruct>` for each field you have associated with it. Mantle simply provides a standardized way of accessing this field data.
     *   Note this follows the standard "Array of Structs" ECS paradigm, where each entity has a slot reserved for it in every field array. M2 doesn't use any special compaction techniques or dynamic field composition for entities. It's just standard vanilla UPROPERTY() marked TArrays.
-
 
 <br>
 
@@ -105,7 +104,7 @@ protected:
 
 ### 2. Defining a Record Set
 
-Fields are just standard vanilla USTRUCTs. Be sure to mark UPROPERTY() for serialization. The macros M2_DECLARE_FIELD and M2_INITIALIZE_FIELD basically just setup the TArray<FYourFieldType> and take care of a little behind the scenes boilerplate for you. They are required for each field you create.
+Fields are just standard vanilla USTRUCTs. Be sure to mark UPROPERTY() for serialization. The macros M2_DECLARE_FIELD and M2_INITIALIZE_FIELD basically just setup the `TArray<FYourFieldType>` and take care of a little behind the scenes boilerplate for you. They are required for each field you create.
 
 ```cpp
 #include "Foundation/M2RecordSet.h"
@@ -140,13 +139,13 @@ class UMyRecordSet : public UM2RecordSet
 {
     GENERATED_BODY()
 
-    M2_DECLARE_FIELD(FMyHealthField, HealthField);
+    M2_DECLARE_FIELD(FMyHealthField, HealthFields);
 
 public:
     virtual void Initialize(FGuid NewSetId) override
     {
         Super::Initialize(NewSetId);
-        M2_INITIALIZE_FIELD(FMyHealthField, HealthField);
+        M2_INITIALIZE_FIELD(FMyHealthField, HealthFields);
     }
 };
 ```
