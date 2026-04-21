@@ -127,6 +127,18 @@ public:
 	FM2RecordHandle AddRecord();
 	virtual FM2RecordHandle AddAndInitializeRecord(const FGameplayTag& InitID);
 	void RemoveRecord(const FM2RecordHandle& RecordHandle);
+	
+	template <typename GameInstanceType>
+	GameInstanceType* GetOwningGameInstance()
+	{
+		if (!CachedGameInstance)
+		{
+			// RecordSets are guaranteed to be owned by the GameInstance
+			CachedGameInstance = GetTypedOuter<UGameInstance>();
+		}
+		
+		return Cast<GameInstanceType>(CachedGameInstance);
+	}
 
 protected:
 	friend TestSuite;
@@ -149,4 +161,7 @@ protected:
 	TArray<TFunction<void(int32)>> RemoveRecordFns;
 	TMap<UScriptStruct*, TFunction<FAnankeUntypedArrayView()>> GetFieldFns;
 	TSet<UScriptStruct*> Archetype;
+	
+	UPROPERTY(Transient)
+	TObjectPtr<UGameInstance> CachedGameInstance;
 };

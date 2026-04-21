@@ -65,7 +65,22 @@ public:
 	virtual void Initialize(UM2Registry* Registry) {}
 	
 	void Run(FM2OperationContext& Ctx);
+	
+	template <typename GameInstanceType>
+	GameInstanceType* GetOwningGameInstance()
+	{
+		if (!CachedGameInstance)
+		{
+			// Operations are guaranteed to be owned by the GameInstance
+			CachedGameInstance = GetTypedOuter<UGameInstance>();
+		}
+		
+		return Cast<GameInstanceType>(CachedGameInstance);
+	}
 
 protected:
 	virtual void PerformOperation(FM2OperationContext& Ctx);
+	
+	UPROPERTY(Transient)
+	TObjectPtr<UGameInstance> CachedGameInstance;
 };
