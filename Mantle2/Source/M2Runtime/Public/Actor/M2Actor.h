@@ -59,7 +59,7 @@ public:
 	
 protected:
 	virtual FM2RecordHandle CreateRecord(UM2Registry& InRegistry);
-	virtual FLD_AvatarActor* GetAvatarField(UM2Registry& InRegistry, FM2RecordHandle& Handle);
+	FLD_AvatarActor* GetAvatarField(UM2Registry& InRegistry, FM2RecordHandle& Handle);
 
 	UPROPERTY()
 	TObjectPtr<UM2Registry> Registry = nullptr;

@@ -44,7 +44,7 @@ bool UM2Registry::HasRecord(const FM2RecordHandle& RecordHandle)
 	);
 }
 
-void UM2Registry::RemoveRecord(FM2RecordHandle& RecordHandle)
+void UM2Registry::RemoveRecord(const FM2RecordHandle& RecordHandle)
 {
 	if (!RecordHandle.SetId.IsValid() || !RecordHandle.RecordId.IsValid())
 	{
@@ -125,7 +125,8 @@ void UM2Registry::ConstructRecordSets()
 
 		auto* NewRecordSet = NewObject<UM2RecordSet>(this, TargetClass);
 		FGuid NewId = FGuid::NewGuid();
-		NewRecordSet->Initialize(NewId);
+		NewRecordSet->PreInitialize(NewId);
+		NewRecordSet->Initialize();
 		SetsById.Add(NewId, NewRecordSet);
 		SetsByType.Add(TargetClass, NewRecordSet);
 	}
@@ -143,6 +144,11 @@ void UM2Registry::ConstructRecordSets()
 
 bool UM2Registry::IsClassExcluded(UClass* TargetClass)
 {
+	if (TargetClass == UM2RecordSet::StaticClass() || TargetClass == UM2TestRecordSet::StaticClass())
+	{
+		return true;
+	}
+	
 	for (TSubclassOf<UM2RecordSet> ExcludeClass : GetExcludedSets())
 	{
 		if (TargetClass->IsChildOf(ExcludeClass.Get()))

@@ -80,7 +80,7 @@ class UM2TestSet_Player : public UM2TestRecordSet
 public:
 	friend TestSuite;
 	
-	virtual void Initialize(FGuid NewSetId) override;
+	virtual void Initialize() override;
 
 	M2_DECLARE_FIELD(FM2TestField_Avatar, Avatar);
 };
@@ -93,7 +93,7 @@ class UM2TestSet_Door : public UM2TestRecordSet
 public:
 	friend TestSuite;
 	
-	virtual void Initialize(FGuid NewSetId) override;
+	virtual void Initialize() override;
 
 	M2_DECLARE_FIELD(FM2TestField_Avatar, Avatar);
 	M2_DECLARE_FIELD(FM2TestField_Door, Door);
@@ -107,7 +107,7 @@ class UM2TestSet_Wall : public UM2TestRecordSet
 public:
 	friend TestSuite;
 	
-	virtual void Initialize(FGuid NewSetId) override;
+	virtual void Initialize() override;
 
 	M2_DECLARE_FIELD(FM2TestField_Avatar, Avatar);
 	M2_DECLARE_FIELD(FM2TestField_StaticEnvironment, StaticEnvironment);
@@ -119,7 +119,7 @@ class UM2TestSet_Excluded : public UM2TestRecordSet
 	GENERATED_BODY()
 
 public:
-	virtual void Initialize(FGuid NewSetId) override;
+	virtual void Initialize() override;
 
 	M2_DECLARE_FIELD(FM2TestField_Avatar, Avatar);
 };

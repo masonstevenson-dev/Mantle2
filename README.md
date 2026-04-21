@@ -144,7 +144,7 @@ class UMyRecordSet : public UM2RecordSet
 public:
     virtual void Initialize(FGuid NewSetId) override
     {
-        Super::Initialize(NewSetId);
+        // dont call super. It throws a fatal error if it hasn't been overriden.
         M2_INITIALIZE_FIELD(FMyHealthField, HealthFields);
     }
 };

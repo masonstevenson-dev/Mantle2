@@ -40,7 +40,7 @@ class M2RUNTIME_API UM2EffectInstance : public UM2RecordSet
 	GENERATED_BODY()
 
 public:
-	virtual void Initialize(FGuid NewSetId) override;
+	virtual void Initialize() override;
 
 	M2_DECLARE_FIELD(FM2EffectMetadata, Metadata);
 };

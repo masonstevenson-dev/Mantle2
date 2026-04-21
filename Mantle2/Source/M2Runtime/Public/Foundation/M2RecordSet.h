@@ -30,6 +30,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
+#include "GameplayTagContainer.h"
 #include "M2Types.h"
 #include "Containers/AnankeUntypedArrayView.h"
 
@@ -64,7 +65,8 @@ class M2RUNTIME_API UM2RecordSet : public UObject
 	GENERATED_BODY()
 
 public:
-	virtual void Initialize(FGuid NewSetId);
+	void PreInitialize(FGuid NewSetId);
+	virtual void Initialize();
 
 	TArrayView<FM2RecordHandle> GetHandles()
 	{
@@ -123,11 +125,13 @@ public:
 	 * @return Returns a RecordHandle, which is a unique id used to look up the new record.
 	 */
 	FM2RecordHandle AddRecord();
-	void RemoveRecord(FM2RecordHandle& RecordHandle);
+	virtual FM2RecordHandle AddAndInitializeRecord(const FGameplayTag& InitID);
+	void RemoveRecord(const FM2RecordHandle& RecordHandle);
 
 protected:
 	friend TestSuite;
 	
+	FM2RecordHandle AddRecordInternal(int32& OutRecordIndex);
 	FAnankeUntypedArrayView GetFieldInternal(UScriptStruct* FieldType);
 
 	UPROPERTY()

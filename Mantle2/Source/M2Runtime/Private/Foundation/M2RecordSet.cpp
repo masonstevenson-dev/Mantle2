@@ -31,7 +31,10 @@
 
 #include "Foundation/M2RecordSet.h"
 
-void UM2RecordSet::Initialize(FGuid NewSetId)
+#include "Logging/M2LoggingDefs.h"
+#include "Logging/M2LoggingMacros.h"
+
+void UM2RecordSet::PreInitialize(FGuid NewSetId)
 {
 	// TODO(): Initialize should be called anytime this RecordSet gets deserialized.
 	SetId = NewSetId;
@@ -40,6 +43,12 @@ void UM2RecordSet::Initialize(FGuid NewSetId)
 	RemoveRecordFns.Empty();
 	GetFieldFns.Empty();
 	Archetype.Empty();
+}
+
+void UM2RecordSet::Initialize()
+{
+	// Fatal because forgetting to call M2_INITIALIZE_FIELD is likely to crash the editor anyway.
+	M2_LOG(LogM2, Fatal, TEXT("Initialize function not overriden for %s! Please override Initialize and use the M2_INITIALIZE_FIELD macro to initialize your fields."), *GetClass()->GetName());
 }
 
 bool UM2RecordSet::MatchArchetype(TArray<UScriptStruct*>& Match, TArray<UScriptStruct*>& Exclude)
@@ -62,10 +71,11 @@ bool UM2RecordSet::MatchArchetype(TArray<UScriptStruct*>& Match, TArray<UScriptS
 	return (Match.Num() + Exclude.Num()) > 0;
 }
 
-FM2RecordHandle UM2RecordSet::AddRecord()
+FM2RecordHandle UM2RecordSet::AddRecordInternal(int32& OutRecordIndex)
 {
 	RecordHandles.Add(FM2RecordHandle(SetId, FGuid::NewGuid()));
-	RecordIndexMap.Add(RecordHandles.Last().RecordId, RecordHandles.Num() - 1);
+	OutRecordIndex = RecordHandles.Num() - 1;
+	RecordIndexMap.Add(RecordHandles.Last().RecordId, OutRecordIndex);
 	for (TFunction<void()> AddFunction : AddRecordFns)
 	{
 		AddFunction();
@@ -74,7 +84,20 @@ FM2RecordHandle UM2RecordSet::AddRecord()
 	return RecordHandles.Last();
 }
 
-void UM2RecordSet::RemoveRecord(FM2RecordHandle& RecordHandle)
+FM2RecordHandle UM2RecordSet::AddRecord()
+{
+	int32 RecordIndex;
+	return AddRecordInternal(RecordIndex);
+}
+
+FM2RecordHandle UM2RecordSet::AddAndInitializeRecord(const FGameplayTag& InitID)
+{
+	// By default, this fn doesn't do anything special. Override it to add your own initialization logic.
+	FM2RecordHandle RH = AddRecord();
+	return RH;
+}
+
+void UM2RecordSet::RemoveRecord(const FM2RecordHandle& RecordHandle)
 {
 	if (!RecordHandle.SetId.IsValid() || RecordHandle.SetId != SetId)
 	{

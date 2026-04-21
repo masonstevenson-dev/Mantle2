@@ -31,9 +31,7 @@
 
 #include "EffectSystem/M2EffectInstance.h"
 
-void UM2EffectInstance::Initialize(FGuid NewSetId)
+void UM2EffectInstance::Initialize()
 {
-	Super::Initialize(NewSetId);
-
 	M2_INITIALIZE_FIELD(FM2EffectMetadata, Metadata);
 }

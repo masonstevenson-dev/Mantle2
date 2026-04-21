@@ -30,6 +30,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
+#include "Foundation/M2Registry.h"
 #include "Foundation/M2Types.h"
 
 #include "M2Effect.generated.h"
