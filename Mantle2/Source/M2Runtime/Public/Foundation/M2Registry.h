@@ -30,6 +30,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #pragma once
+#include "GameplayTagContainer.h"
 #include "M2RecordSet.h"
 
 #include "M2Registry.generated.h"
@@ -64,13 +65,31 @@ public:
 		TObjectPtr<UM2RecordSet>* Result = SetsByType.Find(RecordType::StaticClass());
 		return Result ? Result->Get()->AddRecord() : FM2RecordHandle();
 	}
+	
+	/**
+	 * Adds a record of the target type to the registry.
+	 * 
+	 * Use this version of AddRecord() if you want to keep all of your data initialization inside the RecordSet.
+	 * Use the GameplayTag to inform your RecordSet how the record should be initialized.
+	 * 
+	 * @tparam RecordType - The type of record to add.
+	 * @param InitID - Some game-specific identifier for this record.
+	 * @return - Returns a valid RecordHandle if the record was added.
+	 */
+	template <typename RecordType>
+	FM2RecordHandle AddRecord(const FGameplayTag& InitID)
+	{
+		static_assert(std::is_base_of_v<UM2RecordSet, RecordType>);
+		TObjectPtr<UM2RecordSet>* Result = SetsByType.Find(RecordType::StaticClass());
+		return Result ? Result->Get()->AddAndInitializeRecord(InitID) : FM2RecordHandle();
+	}
 
 	/**
 	 * Removes a record from the registry, if it exists.
 	 * 
 	 * @param RecordHandle - The handle for the record that should be removed.
 	 */
-	void RemoveRecord(FM2RecordHandle& RecordHandle);
+	void RemoveRecord(const FM2RecordHandle& RecordHandle);
 
 	/**
 	 *	Fetches a field for an individual record.
